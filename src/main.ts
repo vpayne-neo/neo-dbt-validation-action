@@ -2,42 +2,66 @@ import * as core from '@actions/core'
 import {wait} from './wait'
 const {Parser} = require('node-sql-parser')
 
+const parseOptions = {
+  database: 'Hive'
+}
 async function run(): Promise<void> {
   const parser = new Parser()
 
-  const someSQL = `with credit_risk_application as (
-    SELECT
-        applicationId,
-        productId,
-        subProductId,
-        applicationBrandId as brandId,
-        tenantId,
-        userId,
-        customerId,
-        accountId,
-        applicationDecision as decision,
-        applicationInReview as inReviewFlag,
-        applicationStatus as status,
-        applicationType,
-        prequalificationId,
-        prequalificationCreatedAt,
-        prequalificationPreApprovalAmount,
-        flaggedForDecline,
-        flaggedForReapply,
-        applicationFlaggedForManualReview as flaggedForManualReview,
-        applicationFlaggedForManualReviewAt as flaggedForManualReviewAt,
-        applicationManualReviewStatus as manualReviewStatus,
-        applicationManualReviewDecision as manualReviewDecision,
-        applicationManualReviewDecisionReason as manualReviewDecisionReason,
-        applicationManualReviewDecidedAt as manualReviewDecidedAt,
-        applicationCreatedAt as createdAt,
-        applicationProcessingStartedAt as processingStartedAt,
-        applicationCompletedAt as completedAt,
-        applicationLastUpdatedAt as updatedAt
-)`
+  const someSQL = `
+  
+`
+  const parseDbtAsNativeSql = (dbtSQL: string): string => {
+    let sql = dbtSQL
+    // const reg = new RegExp(/^(?<=config().*?(?=))$/)
 
-  const ast = parser.astify(someSQL)
-  console.log(ast)
+    sql = sql.replace(/^.*{%-.*$/gm, '')
+    sql = sql.replace(/^.*{%.*$/gm, '')
+    sql = sql.replace(/^.*{%+.*$/gm, '')
+    sql = sql.replace(/^.*where.*$/gm, '')
+    sql = sql.replace(/^.*{{.*$/gm, '')
+    sql = sql.replace(/^.*}}.*$/gm, '')
+    sql = sql.replace(/^.*with.*$/gm, '')
+
+    sql = sql.replace(/\n/g, ' ')
+
+    sql = sql.replace(/config\(.*?[^\)]\)/g, '')
+    sql = sql.replace(')', '')
+    sql = sql.replace('select *', '')
+    const selectCount = (sql.match(/select/g) || []).length
+    if (selectCount > 1) {
+      for (let i = 0; i < selectCount; i++) {
+        sql = sql.replace('select', 'SELECT')
+      }
+    }
+    const fromCount = (sql.match(/from/g) || []).length
+    if (fromCount > 1) {
+      for (let i = 0; i < fromCount; i++) {
+        sql = sql.replace('from', 'FROM')
+      }
+    }
+    const startBrakCount = (sql.match(/\(/g) || []).length
+    if (startBrakCount > 1) {
+      for (let i = 0; i < startBrakCount; i++) {
+        sql = sql.replace('(', '')
+      }
+    }
+    const endBrakCount = (sql.match(/\)/g) || []).length
+    if (endBrakCount > 1) {
+      for (let i = 0; i < endBrakCount; i++) {
+        sql = sql.replace(')', '')
+      }
+    }
+    console.log(sql)
+    return sql
+  }
+
+  parseDbtAsNativeSql(someSQL)
+
+  // const sqlToObject = parser.astify(parseDbtAsNativeSql(someSQL))
+  // const numberOfColumns: number = sqlToObject.columns.length
+  // console.log(sqlToObject)
+  // console.log(`Columns # ${numberOfColumns}`)
 
   try {
     const ms: string = core.getInput('milliseconds')
