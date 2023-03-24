@@ -2,66 +2,65 @@ import * as core from '@actions/core'
 import {wait} from './wait'
 const {Parser} = require('node-sql-parser')
 
-const parseOptions = {
-  database: 'Hive'
-}
 async function run(): Promise<void> {
   const parser = new Parser()
 
-  const someSQL = `
-  
-`
+  const someSQL = ``
+
   const parseDbtAsNativeSql = (dbtSQL: string): string => {
+    // This funtion reads a string and removes dbt patterns from it
     let sql = dbtSQL
-    // const reg = new RegExp(/^(?<=config().*?(?=))$/)
+    sql = sql.replace(/^.*{%-.*$/gm, '') // --
+    sql = sql.replace(/^.*{%.*$/gm, '') //   |
+    sql = sql.replace(/^.*{%+.*$/gm, '') //  --- Remove jinja from sql
+    sql = sql.replace(/^.*--+.*$/gm, '') //--|
 
-    sql = sql.replace(/^.*{%-.*$/gm, '')
-    sql = sql.replace(/^.*{%.*$/gm, '')
-    sql = sql.replace(/^.*{%+.*$/gm, '')
-    sql = sql.replace(/^.*where.*$/gm, '')
-    sql = sql.replace(/^.*{{.*$/gm, '')
-    sql = sql.replace(/^.*}}.*$/gm, '')
-    sql = sql.replace(/^.*with.*$/gm, '')
+    const cteCount = (sql.match(/ as\s\(/g) || []).length // gets the count of how many cte's are in the sql
 
-    sql = sql.replace(/\n/g, ' ')
+    if (cteCount > 1 && cteCount !== 0) {
+      for (let i = 0; i < cteCount; i++) {
+        sql = sql.replace(/\sas\s/, ' as').replace(/\n/g, ' ') // remove space after as for each cte and places string on one line
+        const matchedCte = sql.match(/as\(.*?[^\)]from/)?.map(cte => cte)[0] // assigns current to variable
 
-    sql = sql.replace(/config\(.*?[^\)]\)/g, '')
-    sql = sql.replace(')', '')
-    sql = sql.replace('select *', '')
-    const selectCount = (sql.match(/select/g) || []).length
-    if (selectCount > 1) {
-      for (let i = 0; i < selectCount; i++) {
-        sql = sql.replace('select', 'SELECT')
+        sql = sql.replace(matchedCte ?? '', '')
+
+        if (i == cteCount - 1) {
+          // on the last cte we assign out matched cte to the sql variable
+          sql = matchedCte ?? ''
+          sql = sql?.replace('as(', '').replace('from', '')
+
+          return sql
+        }
       }
+    } else {
+      sql = sql.replace(/\sas\s/, ' as').replace(/\n/g, ' ') // remove space after as
+
+      const selectStatement = sql.match(/as\(.*?[^\)]from/) //matches everythin between as( - from
+      const selectWithoutAs = selectStatement // removes string from regex array and store in variable, then removes as(
+        ?.map(select => select)[0]
+        ?.replace('as(', '')
+
+      const removeFrom = selectWithoutAs?.replace('from', '') //removes 'from' from the string
+      sql = removeFrom ?? ''
+      return sql
     }
-    const fromCount = (sql.match(/from/g) || []).length
-    if (fromCount > 1) {
-      for (let i = 0; i < fromCount; i++) {
-        sql = sql.replace('from', 'FROM')
-      }
-    }
-    const startBrakCount = (sql.match(/\(/g) || []).length
-    if (startBrakCount > 1) {
-      for (let i = 0; i < startBrakCount; i++) {
-        sql = sql.replace('(', '')
-      }
-    }
-    const endBrakCount = (sql.match(/\)/g) || []).length
-    if (endBrakCount > 1) {
-      for (let i = 0; i < endBrakCount; i++) {
-        sql = sql.replace(')', '')
-      }
-    }
-    console.log(sql)
-    return sql
+    return "No CTE's found"
   }
 
   parseDbtAsNativeSql(someSQL)
 
-  // const sqlToObject = parser.astify(parseDbtAsNativeSql(someSQL))
-  // const numberOfColumns: number = sqlToObject.columns.length
-  // console.log(sqlToObject)
-  // console.log(`Columns # ${numberOfColumns}`)
+  const sqlToObject = parser.astify(parseDbtAsNativeSql(someSQL))
+  const columnNames = sqlToObject.columns.map(
+    (col: {
+      expr: {
+        type?: string
+        table?: string
+        column?: string
+      }
+      as?: string
+    }) => `${col.expr.column}` + (col.as ?? '')
+  )
+  console.log(columnNames)
 
   try {
     const ms: string = core.getInput('milliseconds')
