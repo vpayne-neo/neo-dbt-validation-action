@@ -1,28 +1,8 @@
-import * as core from '@actions/core'
-import {wait} from './wait'
 const {Parser} = require('node-sql-parser')
-import {isDeepStrictEqual} from 'util'
-import getYmlDetails from './getYmlDetails'
-import {differenceBy} from 'lodash'
 
-async function run(): Promise<void> {
+const mockRemoveDbtFromSql = (mockSql: string): Array<string> => {
   const parser = new Parser()
-  const someSQL = `
-  with credit_test as (
-        select
-          test1,
-          test2,
-          test3,
-          test4,
-          test5,
-          test6,
-          test7
-
-        from test
-  `
-
   const parseDbtAsNativeSql = (dbtSQL: string): string => {
-    // This funtion reads a string and removes dbt patterns from it
     let sql = dbtSQL
     sql = sql.replace(/^.*{%-.*$/gm, '') // --
     sql = sql.replace(/^.*{%.*$/gm, '') //   |
@@ -42,6 +22,7 @@ async function run(): Promise<void> {
           // on the last cte we assign out matched cte to the sql variable
           sql = matchedCte ?? ''
           sql = sql?.replace('as(', '').replace('from', '')
+
           return sql
         }
       }
@@ -55,14 +36,13 @@ async function run(): Promise<void> {
 
       const removeFrom = selectWithoutAs?.replace('from', '') //removes 'from' from the string
       sql = removeFrom ?? ''
-      console.log(sql)
       return sql
     }
 
     return "No CTE's found"
   }
 
-  const sqlToObject = parser.astify(parseDbtAsNativeSql(someSQL))
+  const sqlToObject = parser.astify(parseDbtAsNativeSql(mockSql))
   const columnNames = sqlToObject.columns
     .map(
       (col: {
@@ -72,47 +52,11 @@ async function run(): Promise<void> {
           column?: string
         }
         as?: string
-      }) => `${col.as ?? col.expr.column}`
+      }) => `${col.expr.column}` + (col.as ?? '')
     )
     .sort()
-
-  console.log(columnNames)
-  const ymlColumnNames = await getYmlDetails('src/test.yml')
-  console.log(ymlColumnNames)
-
-  const ymlColumnCount = ymlColumnNames.length
-  const sqlColumnCount = columnNames.length
-
-  console.log(
-    ` Column names equal? : ${isDeepStrictEqual(ymlColumnNames, columnNames)}`
-  )
-  if (isDeepStrictEqual(ymlColumnNames, columnNames) == false) {
-    const difference = differenceBy(columnNames, ymlColumnNames).map(
-      diff => ` ${diff}`
-    )
-    const errorMsg = `Columns do not match =>> ${difference}`
-    throw new Error(errorMsg)
-  }
-
-  console.log(
-    ` Column count equal? : ${isDeepStrictEqual(
-      ymlColumnCount,
-      sqlColumnCount
-    )}`
-  )
-
-  try {
-    const ms: string = core.getInput('milliseconds')
-    core.debug(`Waiting ${ms} milliseconds ...`) // debug is only output if you set the secret `ACTIONS_STEP_DEBUG` to true
-
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
-
-    core.setOutput('time', new Date().toTimeString())
-  } catch (error) {
-    if (error instanceof Error) core.setFailed(error.message)
-  }
+  return columnNames
+  // This funtion reads a string and removes dbt patterns from it
 }
 
-run()
+export default mockRemoveDbtFromSql
