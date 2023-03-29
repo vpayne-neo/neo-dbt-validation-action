@@ -9,6 +9,6 @@ on:
         required: true
         description: 'list file pairs to be evaluated'
         default: null
-    runs:
-      using: 'node16'
-      main: 'dist/index.js'
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
