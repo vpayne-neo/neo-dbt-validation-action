@@ -5,92 +5,71 @@ import {isDeepStrictEqual} from 'util'
 import getYmlDetails from './getYmlDetails'
 import {differenceBy} from 'lodash'
 import * as fs from 'fs'
-
-const sqlPath = 'src/test.sql'
-const sqlToString = fs.readFileSync(sqlPath, 'utf-8') // parses SQL as string
+import parseDbtAsNativeSql from './parseDbtasNativeSql'
+import {getInput} from '@actions/core'
 
 async function run(): Promise<void> {
-  const parser = new Parser()
+  const paths = getInput('files')
 
-  const parseDbtAsNativeSql = (dbtSQL: string): string => {
-    // This funtion reads a string and removes dbt patterns from it
-    let sql = dbtSQL
-    sql = sql.replace(/^.*{%-.*$/gm, '') // --
-    sql = sql.replace(/^.*{%.*$/gm, '') //   |
-    sql = sql.replace(/^.*{%+.*$/gm, '') //  --- Remove jinja from sql
-    sql = sql.replace(/^.*--+.*$/gm, '') //--|
+  const sqlFilePaths = paths.split(' ').filter(sql => sql.includes('.sql'))
 
-    const cteCount = (sql.match(/ as\s\(/g) || []).length // gets the count of how many cte's are in the sql
+  const ymlFilePaths = paths.split(' ').filter(yml => yml.includes('.yml'))
 
-    if (cteCount > 1 && cteCount !== 0) {
-      for (let i = 0; i < cteCount; i++) {
-        sql = sql.replace(/\sas\s/, ' as').replace(/\n/g, ' ') // remove space after as for each cte and places string on one line
-        const matchedCte = sql.match(/as\(.*?[^\)]from/)?.map(cte => cte)[0] // assigns current cte to variable
+  type SqlYmlFilePairs = {
+    sqlAsString: string
+    ymlFilePath: string
+  }
 
-        sql = sql.replace(matchedCte ?? '', '')
+  const filePairs: Array<SqlYmlFilePairs> = sqlFilePaths.map(sqlFile => {
+    const yml = ymlFilePaths.find(yml =>
+      yml.includes(sqlFile.replace('.sql', ''))
+    )
 
-        if (i == cteCount - 1) {
-          // on the last cte we assign out matched cte to the sql variable
-          sql = matchedCte ?? ''
-          sql = sql?.replace('as(', '').replace('from', '')
-          return sql
-        }
-      }
-    } else {
-      sql = sql.replace(/\sas\s/, ' as').replace(/\n/g, ' ') // remove space after as
+    return {
+      sqlAsString: fs.readFileSync(sqlFile, 'utf-8'),
+      ymlFilePath: yml ?? ''
+    }
+  })
 
-      const selectStatement = sql.match(/as\(.*?[^\)]from/) //matches everythin between as( - from
-      const selectWithoutAs = selectStatement // removes string from regex array and store in variable, then removes as(
-        ?.map(select => select)[0]
-        ?.replace('as(', '')
+  filePairs.map(async pair => {
+    const parser = new Parser()
 
-      const removeFrom = selectWithoutAs?.replace('from', '') //removes 'from' from the string
-      sql = removeFrom ?? ''
-      console.log(sql)
-      return sql
+    const sqlToObject = parser.astify(parseDbtAsNativeSql(pair.sqlAsString))
+    const columnNames = sqlToObject.columns
+      .map(
+        (col: {
+          expr: {
+            type?: string
+            table?: string
+            column?: string
+          }
+          as?: string
+        }) => `${col.as ?? col.expr.column}`
+      )
+      .sort()
+
+    const ymlColumnNames = await getYmlDetails(pair.ymlFilePath)
+    console.log(pair)
+    const ymlColumnCount = ymlColumnNames.length
+    const sqlColumnCount = columnNames.length
+    console.log(
+      ` Column names equal? : ${isDeepStrictEqual(ymlColumnNames, columnNames)}`
+    )
+    if (isDeepStrictEqual(ymlColumnNames, columnNames) == false) {
+      const difference = differenceBy(columnNames, ymlColumnNames).map(
+        diff => ` ${diff}`
+      )
+      const errorMsg = `Columns do not match =>> ${difference}`
+      throw new Error(errorMsg)
     }
 
-    return "No CTE's found"
-  }
-
-  const sqlToObject = parser.astify(parseDbtAsNativeSql(sqlToString))
-  const columnNames = sqlToObject.columns
-    .map(
-      (col: {
-        expr: {
-          type?: string
-          table?: string
-          column?: string
-        }
-        as?: string
-      }) => `${col.as ?? col.expr.column}`
+    console.log(
+      ` Column count equal? : ${isDeepStrictEqual(
+        ymlColumnCount,
+        sqlColumnCount
+      )}`
     )
-    .sort()
-
-  console.log(columnNames)
-  const ymlColumnNames = await getYmlDetails('src/test.yml')
-  console.log(ymlColumnNames)
-
-  const ymlColumnCount = ymlColumnNames.length
-  const sqlColumnCount = columnNames.length
-
-  console.log(
-    ` Column names equal? : ${isDeepStrictEqual(ymlColumnNames, columnNames)}`
-  )
-  if (isDeepStrictEqual(ymlColumnNames, columnNames) == false) {
-    const difference = differenceBy(columnNames, ymlColumnNames).map(
-      diff => ` ${diff}`
-    )
-    const errorMsg = `Columns do not match =>> ${difference}`
-    throw new Error(errorMsg)
-  }
-
-  console.log(
-    ` Column count equal? : ${isDeepStrictEqual(
-      ymlColumnCount,
-      sqlColumnCount
-    )}`
-  )
+  })
 
   try {
     const ms: string = core.getInput('milliseconds')
