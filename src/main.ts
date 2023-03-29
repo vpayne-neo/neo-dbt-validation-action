@@ -64,7 +64,7 @@ async function run(): Promise<void> {
           diff => ` ${diff}`
         )
         const errorMsg = `Columns do not match =>> ${difference}`
-        core.error(errorMsg)
+        throw new Error(errorMsg)
       }
 
       core.debug(

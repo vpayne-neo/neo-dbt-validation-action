@@ -110,7 +110,7 @@ function run() {
                 if ((0, util_1.isDeepStrictEqual)(ymlColumnNames, columnNames) == false) {
                     const difference = (0, lodash_1.differenceBy)(columnNames, ymlColumnNames).map(diff => ` ${diff}`);
                     const errorMsg = `Columns do not match =>> ${difference}`;
-                    core.error(errorMsg);
+                    throw new Error(errorMsg);
                 }
                 core.debug(` Column count equal? : ${(0, util_1.isDeepStrictEqual)(ymlColumnCount, sqlColumnCount)}`);
             }));
