@@ -84,35 +84,41 @@ const parseDbtasNativeSql_1 = __importDefault(__nccwpck_require__(6941));
 const core_1 = __nccwpck_require__(2186);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
-        const paths = (0, core_1.getInput)('files');
-        core.debug(paths);
-        const sqlFilePaths = paths.split(' ').filter(sql => sql.includes('.sql'));
-        const ymlFilePaths = paths.split(' ').filter(yml => yml.includes('.yml'));
-        const filePairs = sqlFilePaths.map(sqlFile => {
-            const yml = ymlFilePaths.find(yml => yml.includes(sqlFile.replace('.sql', '')));
-            return {
-                sqlAsString: fs.readFileSync(sqlFile, 'utf-8'),
-                ymlFilePath: yml !== null && yml !== void 0 ? yml : ''
-            };
-        });
-        filePairs.map((pair) => __awaiter(this, void 0, void 0, function* () {
-            const parser = new Parser();
-            const sqlToObject = parser.astify((0, parseDbtasNativeSql_1.default)(pair.sqlAsString));
-            const columnNames = sqlToObject.columns
-                .map((col) => { var _a; return `${(_a = col.as) !== null && _a !== void 0 ? _a : col.expr.column}`; })
-                .sort();
-            const ymlColumnNames = yield (0, getYmlDetails_1.default)(pair.ymlFilePath);
-            console.log(pair);
-            const ymlColumnCount = ymlColumnNames.length;
-            const sqlColumnCount = columnNames.length;
-            console.log(` Column names equal? : ${(0, util_1.isDeepStrictEqual)(ymlColumnNames, columnNames)}`);
-            if ((0, util_1.isDeepStrictEqual)(ymlColumnNames, columnNames) == false) {
-                const difference = (0, lodash_1.differenceBy)(columnNames, ymlColumnNames).map(diff => ` ${diff}`);
-                const errorMsg = `Columns do not match =>> ${difference}`;
-                core.error(errorMsg);
-            }
-            core.debug(` Column count equal? : ${(0, util_1.isDeepStrictEqual)(ymlColumnCount, sqlColumnCount)}`);
-        }));
+        try {
+            const paths = (0, core_1.getInput)('files');
+            core.debug(paths);
+            const sqlFilePaths = paths.split(' ').filter(sql => sql.includes('.sql'));
+            const ymlFilePaths = paths.split(' ').filter(yml => yml.includes('.yml'));
+            const filePairs = sqlFilePaths.map(sqlFile => {
+                const yml = ymlFilePaths.find(yml => yml.includes(sqlFile.replace('.sql', '')));
+                return {
+                    sqlAsString: fs.readFileSync(sqlFile, 'utf-8'),
+                    ymlFilePath: yml !== null && yml !== void 0 ? yml : ''
+                };
+            });
+            filePairs.map((pair) => __awaiter(this, void 0, void 0, function* () {
+                const parser = new Parser();
+                const sqlToObject = parser.astify((0, parseDbtasNativeSql_1.default)(pair.sqlAsString));
+                const columnNames = sqlToObject.columns
+                    .map((col) => { var _a; return `${(_a = col.as) !== null && _a !== void 0 ? _a : col.expr.column}`; })
+                    .sort();
+                const ymlColumnNames = yield (0, getYmlDetails_1.default)(pair.ymlFilePath);
+                console.log(pair);
+                const ymlColumnCount = ymlColumnNames.length;
+                const sqlColumnCount = columnNames.length;
+                console.log(` Column names equal? : ${(0, util_1.isDeepStrictEqual)(ymlColumnNames, columnNames)}`);
+                if ((0, util_1.isDeepStrictEqual)(ymlColumnNames, columnNames) == false) {
+                    const difference = (0, lodash_1.differenceBy)(columnNames, ymlColumnNames).map(diff => ` ${diff}`);
+                    const errorMsg = `Columns do not match =>> ${difference}`;
+                    core.error(errorMsg);
+                }
+                throw new Error(` Column count equal? : ${(0, util_1.isDeepStrictEqual)(ymlColumnCount, sqlColumnCount)}`);
+            }));
+        }
+        catch (err) {
+            console.error(err);
+            process.exit();
+        }
     });
 }
 run();
