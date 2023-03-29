@@ -82,10 +82,11 @@ const getYmlDetails_1 = __importDefault(__nccwpck_require__(3577));
 const lodash_1 = __nccwpck_require__(250);
 const fs = __importStar(__nccwpck_require__(5747));
 const parseDbtasNativeSql_1 = __importDefault(__nccwpck_require__(6941));
+const core_1 = __nccwpck_require__(2186);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
-        // const paths = getInput('files')
-        const paths = 'src/test.sql src/test.yml src/test_2.sql src/test_2.yml';
+        const paths = (0, core_1.getInput)('files');
+        core.debug(paths);
         const sqlFilePaths = paths.split(' ').filter(sql => sql.includes('.sql'));
         const ymlFilePaths = paths.split(' ').filter(yml => yml.includes('.yml'));
         const filePairs = sqlFilePaths.map(sqlFile => {
