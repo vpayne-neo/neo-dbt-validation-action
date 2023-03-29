@@ -8,6 +8,5 @@ inputs:
     required: true
 
 runs:
-  using: 'node12'
-  main: 'dist/index.js'
-  node-version: '16.x'
+  using: 'node16'
+  main: 'dis/index.js'
