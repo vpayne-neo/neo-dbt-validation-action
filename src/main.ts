@@ -10,7 +10,7 @@ import {getInput} from '@actions/core'
 
 async function run(): Promise<void> {
   const paths = getInput('files')
-
+  core.debug(paths)
   const sqlFilePaths = paths.split(' ').filter(sql => sql.includes('.sql'))
 
   const ymlFilePaths = paths.split(' ').filter(yml => yml.includes('.yml'))
