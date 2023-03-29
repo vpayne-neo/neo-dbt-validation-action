@@ -98,6 +98,7 @@ function run() {
             });
             filePairs.map((pair) => __awaiter(this, void 0, void 0, function* () {
                 const parser = new Parser();
+                (0, parseDbtasNativeSql_1.default)(pair.sqlAsString);
                 const sqlToObject = parser.astify((0, parseDbtasNativeSql_1.default)(pair.sqlAsString));
                 const columnNames = sqlToObject.columns
                     .map((col) => { var _a; return `${(_a = col.as) !== null && _a !== void 0 ? _a : col.expr.column}`; })
@@ -143,27 +144,28 @@ const parseDbtAsNativeSql = (dbtSQL) => {
     const cteCount = (sql.match(/ as\s\(/g) || []).length; // gets the count of how many cte's are in the sql
     if (cteCount > 1 && cteCount !== 0) {
         for (let i = 0; i < cteCount; i++) {
-            sql = sql.replace(/\sas\s/, ' as').replace(/\n/g, ' '); // remove space after as for each cte and places string on one line
+            sql = sql.replace(/\sas\s/, ' as').replace(/\n/g, ' ');
+            // remove space after as for each cte and places string on one line
             const matchedCte = (_a = sql.match(/as\(.*?[^\)]from/)) === null || _a === void 0 ? void 0 : _a.map(cte => cte)[0]; // assigns current cte to variable
             sql = sql.replace(matchedCte !== null && matchedCte !== void 0 ? matchedCte : '', '');
             if (i == cteCount - 1) {
                 // on the last cte we assign out matched cte to the sql variable
                 sql = matchedCte !== null && matchedCte !== void 0 ? matchedCte : '';
-                sql = sql === null || sql === void 0 ? void 0 : sql.replace('as(', '').replace('from', '');
+                sql = sql === null || sql === void 0 ? void 0 : sql.replace('as(', '').replace('from ', '');
                 return sql;
             }
         }
     }
     else {
-        sql = sql.replace(/\sas\s/, ' as').replace(/\n/g, ' '); // remove space after as
-        const selectStatement = sql.match(/as\(.*?[^\)]from/); //matches everythin between as( - from
+        sql = sql.replace(/\sas\s/, ' as').replace(/\n/g, ' ');
+        // remove space after as
+        const selectStatement = sql.match(/as\(.*?[^\)]from\s/); //matches everythin between as( - from
         const selectWithoutAs = (_b = selectStatement // removes string from regex array and store in variable, then removes as(
          === null || selectStatement // removes string from regex array and store in variable, then removes as(
          === void 0 ? void 0 : selectStatement // removes string from regex array and store in variable, then removes as(
         .map(select => select)[0]) === null || _b === void 0 ? void 0 : _b.replace('as(', '');
-        const removeFrom = selectWithoutAs === null || selectWithoutAs === void 0 ? void 0 : selectWithoutAs.replace('from', ''); //removes 'from' from the string
+        const removeFrom = selectWithoutAs === null || selectWithoutAs === void 0 ? void 0 : selectWithoutAs.replace('from ', ''); //removes 'from' from the string
         sql = removeFrom !== null && removeFrom !== void 0 ? removeFrom : '';
-        console.log(sql);
         return sql;
     }
     return "No CTE's found";
