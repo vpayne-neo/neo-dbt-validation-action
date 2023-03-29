@@ -1,0 +1,36 @@
+version: 2
+
+sources:
+  - name: test
+    description: test
+    tables:
+      - name: test
+        description: test
+        columns:
+          - name: test1
+          - name: test2
+          - name: test3
+          - name: test4
+          - name: test5
+          - name: test6
+          - name: test7
+      - name: test_table2
+        description: test
+        columns:
+          - name: test1
+          - name: test2
+          - name: test3
+          - name: test4
+          - name: test5
+          - name: test6
+          - name: test7
+      - name: test_table3
+        description: test
+        columns:
+          - name: success1
+          - name: success2
+          - name: success3
+          - name: success4
+          - name: success5
+          - name: success6
+          - name: success7
