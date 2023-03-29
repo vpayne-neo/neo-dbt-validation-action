@@ -103,16 +103,16 @@ function run() {
                     .map((col) => { var _a; return `${(_a = col.as) !== null && _a !== void 0 ? _a : col.expr.column}`; })
                     .sort();
                 const ymlColumnNames = yield (0, getYmlDetails_1.default)(pair.ymlFilePath);
-                console.log(pair);
+                core.debug(`${pair.sqlAsString} \n ${pair.ymlFilePath}`);
                 const ymlColumnCount = ymlColumnNames.length;
                 const sqlColumnCount = columnNames.length;
-                console.log(` Column names equal? : ${(0, util_1.isDeepStrictEqual)(ymlColumnNames, columnNames)}`);
+                core.debug(` Column names equal? : ${(0, util_1.isDeepStrictEqual)(ymlColumnNames, columnNames)}`);
                 if ((0, util_1.isDeepStrictEqual)(ymlColumnNames, columnNames) == false) {
                     const difference = (0, lodash_1.differenceBy)(columnNames, ymlColumnNames).map(diff => ` ${diff}`);
                     const errorMsg = `Columns do not match =>> ${difference}`;
                     core.error(errorMsg);
                 }
-                throw new Error(` Column count equal? : ${(0, util_1.isDeepStrictEqual)(ymlColumnCount, sqlColumnCount)}`);
+                core.debug(` Column count equal? : ${(0, util_1.isDeepStrictEqual)(ymlColumnCount, sqlColumnCount)}`);
             }));
         }
         catch (err) {

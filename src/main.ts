@@ -50,10 +50,10 @@ async function run(): Promise<void> {
         .sort()
 
       const ymlColumnNames = await getYmlDetails(pair.ymlFilePath)
-      console.log(pair)
+      core.debug(`${pair.sqlAsString} \n ${pair.ymlFilePath}`)
       const ymlColumnCount = ymlColumnNames.length
       const sqlColumnCount = columnNames.length
-      console.log(
+      core.debug(
         ` Column names equal? : ${isDeepStrictEqual(
           ymlColumnNames,
           columnNames
@@ -67,7 +67,7 @@ async function run(): Promise<void> {
         core.error(errorMsg)
       }
 
-      throw new Error(
+      core.debug(
         ` Column count equal? : ${isDeepStrictEqual(
           ymlColumnCount,
           sqlColumnCount
