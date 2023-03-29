@@ -1,11 +1,14 @@
 name: 'Vince Payne'
 description: 'Reads changed SQL and YML files anc checks for column equivalency'
 author: 'Vince Payne - Neo Financial'
-inputs:
-  files:
-    required: true
-    description: 'list file pairs to be evaluated'
-    default: null
-runs:
-  using: 'node16'
-  main: 'dist/index.js'
+
+on:
+  workflow_dispatch:
+    inputs:
+      files:
+        required: true
+        description: 'list file pairs to be evaluated'
+        default: null
+    runs:
+      using: 'node16'
+      main: 'dist/index.js'
