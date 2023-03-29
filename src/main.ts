@@ -4,22 +4,13 @@ const {Parser} = require('node-sql-parser')
 import {isDeepStrictEqual} from 'util'
 import getYmlDetails from './getYmlDetails'
 import {differenceBy} from 'lodash'
+import * as fs from 'fs'
+
+const sqlPath = 'src/test.sql'
+const sqlToString = fs.readFileSync(sqlPath, 'utf-8') // parses SQL as string
 
 async function run(): Promise<void> {
   const parser = new Parser()
-  const someSQL = `
-  with credit_test as (
-        select
-          test1,
-          test2,
-          test3,
-          test4,
-          test5,
-          test6,
-          test7
-
-        from test
-  `
 
   const parseDbtAsNativeSql = (dbtSQL: string): string => {
     // This funtion reads a string and removes dbt patterns from it
@@ -34,7 +25,7 @@ async function run(): Promise<void> {
     if (cteCount > 1 && cteCount !== 0) {
       for (let i = 0; i < cteCount; i++) {
         sql = sql.replace(/\sas\s/, ' as').replace(/\n/g, ' ') // remove space after as for each cte and places string on one line
-        const matchedCte = sql.match(/as\(.*?[^\)]from/)?.map(cte => cte)[0] // assigns current to variable
+        const matchedCte = sql.match(/as\(.*?[^\)]from/)?.map(cte => cte)[0] // assigns current cte to variable
 
         sql = sql.replace(matchedCte ?? '', '')
 
@@ -62,7 +53,7 @@ async function run(): Promise<void> {
     return "No CTE's found"
   }
 
-  const sqlToObject = parser.astify(parseDbtAsNativeSql(someSQL))
+  const sqlToObject = parser.astify(parseDbtAsNativeSql(sqlToString))
   const columnNames = sqlToObject.columns
     .map(
       (col: {

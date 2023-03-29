@@ -3,6 +3,7 @@ const {Parser} = require('node-sql-parser')
 const mockRemoveDbtFromSql = (mockSql: string): Array<string> => {
   const parser = new Parser()
   const parseDbtAsNativeSql = (dbtSQL: string): string => {
+    // This funtion reads a string and removes dbt patterns from it
     let sql = dbtSQL
     sql = sql.replace(/^.*{%-.*$/gm, '') // --
     sql = sql.replace(/^.*{%.*$/gm, '') //   |
@@ -22,7 +23,6 @@ const mockRemoveDbtFromSql = (mockSql: string): Array<string> => {
           // on the last cte we assign out matched cte to the sql variable
           sql = matchedCte ?? ''
           sql = sql?.replace('as(', '').replace('from', '')
-
           return sql
         }
       }
@@ -36,6 +36,7 @@ const mockRemoveDbtFromSql = (mockSql: string): Array<string> => {
 
       const removeFrom = selectWithoutAs?.replace('from', '') //removes 'from' from the string
       sql = removeFrom ?? ''
+      console.log(sql)
       return sql
     }
 
@@ -52,7 +53,7 @@ const mockRemoveDbtFromSql = (mockSql: string): Array<string> => {
           column?: string
         }
         as?: string
-      }) => `${col.expr.column}` + (col.as ?? '')
+      }) => `${col.as ?? col.expr.column}`
     )
     .sort()
   return columnNames

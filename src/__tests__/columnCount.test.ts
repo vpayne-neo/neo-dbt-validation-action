@@ -11,9 +11,12 @@ test('Number of columns should be equal', async () => {
   expect((await ymlDetails).length).toEqual(sqlToCompare.length)
 })
 
-// test('Number of columns should be equal', async () => {
-//   const ymlDetails = mockGetYmlDetails(filePath)
-//   const sqlToCompare = mockRemoveDbtFromSql(sqlPatternThree)
+test('Number of columns should be equal', async () => {
+  const filePath = 'src/__tests__/mockYmlFiles/mockYmlPatternThree.yml'
+  const ymlDetails = mockGetYmlDetails(filePath)
+  const sqlToCompare = mockRemoveDbtFromSql(sqlPatternThree)
+  console.log(ymlDetails)
+  console.log(sqlToCompare)
 
-//   expect((await ymlDetails).length).toEqual(sqlToCompare.length)
-// })
+  expect((await ymlDetails).length).toEqual(sqlToCompare.length)
+})
