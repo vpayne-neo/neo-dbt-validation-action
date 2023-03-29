@@ -63,7 +63,7 @@ async function run(): Promise<void> {
       throw new Error(errorMsg)
     }
 
-    console.log(
+    core.debug(
       ` Column count equal? : ${isDeepStrictEqual(
         ymlColumnCount,
         sqlColumnCount

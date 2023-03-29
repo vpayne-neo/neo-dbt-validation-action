@@ -111,7 +111,7 @@ function run() {
                 const errorMsg = `Columns do not match =>> ${difference}`;
                 throw new Error(errorMsg);
             }
-            console.log(` Column count equal? : ${(0, util_1.isDeepStrictEqual)(ymlColumnCount, sqlColumnCount)}`);
+            core.debug(` Column count equal? : ${(0, util_1.isDeepStrictEqual)(ymlColumnCount, sqlColumnCount)}`);
         }));
     });
 }
