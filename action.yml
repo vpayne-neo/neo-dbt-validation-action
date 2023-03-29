@@ -2,7 +2,7 @@ name: 'Vince Payne'
 description: 'Reads changed SQL and YML files anc checks for column equivalency'
 author: 'Vince Payne - Neo Financial'
 inputs:
-  milliseconds: # change this
+  milliseconds: 1000
     required: true
     description: 'input description here'
     default: 'default value if applicable'
