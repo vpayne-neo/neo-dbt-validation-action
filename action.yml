@@ -6,6 +6,10 @@ inputs:
     required: true
     description: 'input description here'
     default: 'default value if applicable'
+  files:
+    required: true
+    description: 'list file pairs to be evaluated'
+    default: null
 runs:
   using: 'node16'
   main: 'dist/index.js'

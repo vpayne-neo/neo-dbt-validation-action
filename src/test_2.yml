@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: test
+    description: test
+    tables:
+      - name: test
+        description: test
+        columns:
+          - name: secondTest1
+          - name: secondTest2
+          - name: secondTest3
+          - name: secondTest4
+          - name: secondTest5
+          - name: secondTest6
+          - name: secondTest7
