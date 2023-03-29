@@ -81,63 +81,38 @@ const util_1 = __nccwpck_require__(1669);
 const getYmlDetails_1 = __importDefault(__nccwpck_require__(3577));
 const lodash_1 = __nccwpck_require__(250);
 const fs = __importStar(__nccwpck_require__(5747));
-const sqlPath = 'src/test.sql';
-const sqlToString = fs.readFileSync(sqlPath, 'utf-8'); // parses SQL as string
+const parseDbtasNativeSql_1 = __importDefault(__nccwpck_require__(6941));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
-        const parser = new Parser();
-        const parseDbtAsNativeSql = (dbtSQL) => {
-            var _a, _b;
-            // This funtion reads a string and removes dbt patterns from it
-            let sql = dbtSQL;
-            sql = sql.replace(/^.*{%-.*$/gm, ''); // --
-            sql = sql.replace(/^.*{%.*$/gm, ''); //   |
-            sql = sql.replace(/^.*{%+.*$/gm, ''); //  --- Remove jinja from sql
-            sql = sql.replace(/^.*--+.*$/gm, ''); //--|
-            const cteCount = (sql.match(/ as\s\(/g) || []).length; // gets the count of how many cte's are in the sql
-            if (cteCount > 1 && cteCount !== 0) {
-                for (let i = 0; i < cteCount; i++) {
-                    sql = sql.replace(/\sas\s/, ' as').replace(/\n/g, ' '); // remove space after as for each cte and places string on one line
-                    const matchedCte = (_a = sql.match(/as\(.*?[^\)]from/)) === null || _a === void 0 ? void 0 : _a.map(cte => cte)[0]; // assigns current cte to variable
-                    sql = sql.replace(matchedCte !== null && matchedCte !== void 0 ? matchedCte : '', '');
-                    if (i == cteCount - 1) {
-                        // on the last cte we assign out matched cte to the sql variable
-                        sql = matchedCte !== null && matchedCte !== void 0 ? matchedCte : '';
-                        sql = sql === null || sql === void 0 ? void 0 : sql.replace('as(', '').replace('from', '');
-                        return sql;
-                    }
-                }
+        // const paths = getInput('files')
+        const paths = 'src/test.sql src/test.yml src/test_2.sql src/test_2.yml';
+        const sqlFilePaths = paths.split(' ').filter(sql => sql.includes('.sql'));
+        const ymlFilePaths = paths.split(' ').filter(yml => yml.includes('.yml'));
+        const filePairs = sqlFilePaths.map(sqlFile => {
+            const yml = ymlFilePaths.find(yml => yml.includes(sqlFile.replace('.sql', '')));
+            return {
+                sqlAsString: fs.readFileSync(sqlFile, 'utf-8'),
+                ymlFilePath: yml !== null && yml !== void 0 ? yml : ''
+            };
+        });
+        filePairs.map((pair) => __awaiter(this, void 0, void 0, function* () {
+            const parser = new Parser();
+            const sqlToObject = parser.astify((0, parseDbtasNativeSql_1.default)(pair.sqlAsString));
+            const columnNames = sqlToObject.columns
+                .map((col) => { var _a; return `${(_a = col.as) !== null && _a !== void 0 ? _a : col.expr.column}`; })
+                .sort();
+            const ymlColumnNames = yield (0, getYmlDetails_1.default)(pair.ymlFilePath);
+            console.log(pair);
+            const ymlColumnCount = ymlColumnNames.length;
+            const sqlColumnCount = columnNames.length;
+            console.log(` Column names equal? : ${(0, util_1.isDeepStrictEqual)(ymlColumnNames, columnNames)}`);
+            if ((0, util_1.isDeepStrictEqual)(ymlColumnNames, columnNames) == false) {
+                const difference = (0, lodash_1.differenceBy)(columnNames, ymlColumnNames).map(diff => ` ${diff}`);
+                const errorMsg = `Columns do not match =>> ${difference}`;
+                throw new Error(errorMsg);
             }
-            else {
-                sql = sql.replace(/\sas\s/, ' as').replace(/\n/g, ' '); // remove space after as
-                const selectStatement = sql.match(/as\(.*?[^\)]from/); //matches everythin between as( - from
-                const selectWithoutAs = (_b = selectStatement // removes string from regex array and store in variable, then removes as(
-                 === null || selectStatement // removes string from regex array and store in variable, then removes as(
-                 === void 0 ? void 0 : selectStatement // removes string from regex array and store in variable, then removes as(
-                .map(select => select)[0]) === null || _b === void 0 ? void 0 : _b.replace('as(', '');
-                const removeFrom = selectWithoutAs === null || selectWithoutAs === void 0 ? void 0 : selectWithoutAs.replace('from', ''); //removes 'from' from the string
-                sql = removeFrom !== null && removeFrom !== void 0 ? removeFrom : '';
-                console.log(sql);
-                return sql;
-            }
-            return "No CTE's found";
-        };
-        const sqlToObject = parser.astify(parseDbtAsNativeSql(sqlToString));
-        const columnNames = sqlToObject.columns
-            .map((col) => { var _a; return `${(_a = col.as) !== null && _a !== void 0 ? _a : col.expr.column}`; })
-            .sort();
-        console.log(columnNames);
-        const ymlColumnNames = yield (0, getYmlDetails_1.default)('src/test.yml');
-        console.log(ymlColumnNames);
-        const ymlColumnCount = ymlColumnNames.length;
-        const sqlColumnCount = columnNames.length;
-        console.log(` Column names equal? : ${(0, util_1.isDeepStrictEqual)(ymlColumnNames, columnNames)}`);
-        if ((0, util_1.isDeepStrictEqual)(ymlColumnNames, columnNames) == false) {
-            const difference = (0, lodash_1.differenceBy)(columnNames, ymlColumnNames).map(diff => ` ${diff}`);
-            const errorMsg = `Columns do not match =>> ${difference}`;
-            throw new Error(errorMsg);
-        }
-        console.log(` Column count equal? : ${(0, util_1.isDeepStrictEqual)(ymlColumnCount, sqlColumnCount)}`);
+            console.log(` Column count equal? : ${(0, util_1.isDeepStrictEqual)(ymlColumnCount, sqlColumnCount)}`);
+        }));
         try {
             const ms = core.getInput('milliseconds');
             core.debug(`Waiting ${ms} milliseconds ...`); // debug is only output if you set the secret `ACTIONS_STEP_DEBUG` to true
@@ -153,6 +128,53 @@ function run() {
     });
 }
 run();
+
+
+/***/ }),
+
+/***/ 6941:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const parseDbtAsNativeSql = (dbtSQL) => {
+    var _a, _b;
+    // This funtion reads a string and removes dbt patterns from it
+    let sql = dbtSQL;
+    sql = sql.replace(/^.*{%-.*$/gm, ''); // --
+    sql = sql.replace(/^.*{%.*$/gm, ''); //   |
+    sql = sql.replace(/^.*{%+.*$/gm, ''); //  --- Remove jinja from sql
+    sql = sql.replace(/^.*--+.*$/gm, ''); //--|
+    const cteCount = (sql.match(/ as\s\(/g) || []).length; // gets the count of how many cte's are in the sql
+    if (cteCount > 1 && cteCount !== 0) {
+        for (let i = 0; i < cteCount; i++) {
+            sql = sql.replace(/\sas\s/, ' as').replace(/\n/g, ' '); // remove space after as for each cte and places string on one line
+            const matchedCte = (_a = sql.match(/as\(.*?[^\)]from/)) === null || _a === void 0 ? void 0 : _a.map(cte => cte)[0]; // assigns current cte to variable
+            sql = sql.replace(matchedCte !== null && matchedCte !== void 0 ? matchedCte : '', '');
+            if (i == cteCount - 1) {
+                // on the last cte we assign out matched cte to the sql variable
+                sql = matchedCte !== null && matchedCte !== void 0 ? matchedCte : '';
+                sql = sql === null || sql === void 0 ? void 0 : sql.replace('as(', '').replace('from', '');
+                return sql;
+            }
+        }
+    }
+    else {
+        sql = sql.replace(/\sas\s/, ' as').replace(/\n/g, ' '); // remove space after as
+        const selectStatement = sql.match(/as\(.*?[^\)]from/); //matches everythin between as( - from
+        const selectWithoutAs = (_b = selectStatement // removes string from regex array and store in variable, then removes as(
+         === null || selectStatement // removes string from regex array and store in variable, then removes as(
+         === void 0 ? void 0 : selectStatement // removes string from regex array and store in variable, then removes as(
+        .map(select => select)[0]) === null || _b === void 0 ? void 0 : _b.replace('as(', '');
+        const removeFrom = selectWithoutAs === null || selectWithoutAs === void 0 ? void 0 : selectWithoutAs.replace('from', ''); //removes 'from' from the string
+        sql = removeFrom !== null && removeFrom !== void 0 ? removeFrom : '';
+        console.log(sql);
+        return sql;
+    }
+    return "No CTE's found";
+};
+exports.default = parseDbtAsNativeSql;
 
 
 /***/ }),
