@@ -1,5 +1,4 @@
 import * as core from '@actions/core'
-import {wait} from './wait'
 const {Parser} = require('node-sql-parser')
 import {isDeepStrictEqual} from 'util'
 import getYmlDetails from './getYmlDetails'
