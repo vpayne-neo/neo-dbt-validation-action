@@ -1,9 +1,9 @@
 {
-  "name": "typescript-action",
+  "name": "neo-dbt-validation-action",
   "version": "0.0.0",
   "private": true,
-  "description": "TypeScript template action",
-  "main": "lib/main.js",
+  "description": "Ensure consistency between DBT sql and yaml files",
+  "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
     "read": "node",
@@ -16,14 +16,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/typescript-action.git"
+    "url": "git+https://github.com/vpayne-neo/neo-dbt-validation-action.git"
   },
   "keywords": [
     "actions",
     "node",
     "setup"
   ],
-  "author": "",
+  "author": "Neo Financial Engineering <engineering@neofinancial.com>",
   "license": "MIT",
   "dependencies": {
     "@actions/core": "^1.10.0",
