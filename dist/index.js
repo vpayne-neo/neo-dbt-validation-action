@@ -98,7 +98,6 @@ function run() {
             });
             filePairs.map((pair) => __awaiter(this, void 0, void 0, function* () {
                 const parser = new Parser();
-                (0, parseDbtasNativeSql_1.default)(pair.sqlAsString);
                 const sqlToObject = parser.astify((0, parseDbtasNativeSql_1.default)(pair.sqlAsString));
                 const columnNames = sqlToObject.columns
                     .map((col) => { var _a; return `${(_a = col.as) !== null && _a !== void 0 ? _a : col.expr.column}`; })
@@ -151,21 +150,23 @@ const parseDbtAsNativeSql = (dbtSQL) => {
             if (i == cteCount - 1) {
                 // on the last cte we assign out matched cte to the sql variable
                 sql = matchedCte !== null && matchedCte !== void 0 ? matchedCte : '';
-                sql = sql === null || sql === void 0 ? void 0 : sql.replace('as(', '').replace('from ', '');
+                sql = sql === null || sql === void 0 ? void 0 : sql.replace('as(', '');
+                const columnJinja = sql === null || sql === void 0 ? void 0 : sql.match(/{{.*?[^]}}\sas/g);
+                columnJinja === null || columnJinja === void 0 ? void 0 : columnJinja.map(jinja => (sql = sql === null || sql === void 0 ? void 0 : sql.replace(jinja, '')));
+                sql = sql.concat(' '); //adds white space to end of string to make sure final "from " is matched
+                sql = sql.replace('from ', '');
                 return sql;
             }
         }
     }
     else {
-        sql = sql.replace(/\sas\s/, ' as').replace(/\n/g, ' ');
-        // remove space after as
+        sql = sql.replace(/\sas\s/, ' as').replace(/\n/g, ' '); // remove space after as and formats string on one line
         const selectStatement = sql.match(/as\(.*?[^\)]from\s/); //matches everythin between as( - from
-        const selectWithoutAs = (_b = selectStatement // removes string from regex array and store in variable, then removes as(
-         === null || selectStatement // removes string from regex array and store in variable, then removes as(
-         === void 0 ? void 0 : selectStatement // removes string from regex array and store in variable, then removes as(
-        .map(select => select)[0]) === null || _b === void 0 ? void 0 : _b.replace('as(', '');
-        const removeFrom = selectWithoutAs === null || selectWithoutAs === void 0 ? void 0 : selectWithoutAs.replace('from ', ''); //removes 'from' from the string
-        sql = removeFrom !== null && removeFrom !== void 0 ? removeFrom : '';
+        const selectWithoutAs = (_b = selectStatement === null || selectStatement === void 0 ? void 0 : selectStatement.map(select => select)[0]) === null || _b === void 0 ? void 0 : _b.replace('as(', ''); // removes string from regex array and store in variable, then removes as(
+        sql = selectWithoutAs !== null && selectWithoutAs !== void 0 ? selectWithoutAs : '';
+        const columnJinja = sql === null || sql === void 0 ? void 0 : sql.match(/{{.*?[^]}}\sas/g); // finds all occurences of column jinja and removes it while leaving column name
+        columnJinja === null || columnJinja === void 0 ? void 0 : columnJinja.map(jinja => (sql = sql === null || sql === void 0 ? void 0 : sql.replace(jinja, '')));
+        sql = sql === null || sql === void 0 ? void 0 : sql.replace('from ', ''); //removes 'from' from the string
         return sql;
     }
     return "No CTE's found";
