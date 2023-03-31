@@ -1,3 +1,5 @@
+import {differenceBy} from 'lodash'
+
 const parseDbtAsNativeSql = (dbtSQL: string): string => {
   // This funtion reads a string and removes dbt patterns from it
   let sql = dbtSQL
@@ -11,6 +13,7 @@ const parseDbtAsNativeSql = (dbtSQL: string): string => {
   if (cteCount > 1 && cteCount !== 0) {
     for (let i = 0; i < cteCount; i++) {
       sql = sql.replace(/\sas\s/, ' as').replace(/\n/g, ' ')
+
       // remove space after as for each cte and places string on one line
       const matchedCte = sql.match(/as\(.*?[^\)]from/)?.map(cte => cte)[0] // assigns current cte to variable
 
@@ -20,23 +23,32 @@ const parseDbtAsNativeSql = (dbtSQL: string): string => {
         // on the last cte we assign out matched cte to the sql variable
         sql = matchedCte ?? ''
 
-        sql = sql?.replace('as(', '').replace('from ', '')
+        sql = sql?.replace('as(', '')
+
+        const columnJinja = sql?.match(/{{.*?[^]}}\sas/g)
+
+        columnJinja?.map(jinja => (sql = sql?.replace(jinja, '')))
+
+        sql = sql.concat(' ') //adds white space to end of string to make sure final "from " is matched
+        sql = sql.replace('from ', '')
 
         return sql
       }
     }
   } else {
-    sql = sql.replace(/\sas\s/, ' as').replace(/\n/g, ' ')
-    // remove space after as
+    sql = sql.replace(/\sas\s/, ' as').replace(/\n/g, ' ') // remove space after as and formats string on one line
     const selectStatement = sql.match(/as\(.*?[^\)]from\s/) //matches everythin between as( - from
 
-    const selectWithoutAs = selectStatement // removes string from regex array and store in variable, then removes as(
+    const selectWithoutAs = selectStatement
       ?.map(select => select)[0]
-      ?.replace('as(', '')
+      ?.replace('as(', '') // removes string from regex array and store in variable, then removes as(
 
-    const removeFrom = selectWithoutAs?.replace('from ', '') //removes 'from' from the string
+    sql = selectWithoutAs ?? ''
 
-    sql = removeFrom ?? ''
+    const columnJinja = sql?.match(/{{.*?[^]}}\sas/g) // finds all occurences of column jinja and removes it while leaving column name
+    columnJinja?.map(jinja => (sql = sql?.replace(jinja, '')))
+
+    sql = sql?.replace('from ', '') //removes 'from' from the string
     return sql
   }
 

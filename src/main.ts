@@ -10,10 +10,9 @@ import {getInput} from '@actions/core'
 async function run(): Promise<void> {
   try {
     const paths = getInput('files')
-
     core.debug(paths)
-    const sqlFilePaths = paths.split(' ').filter(sql => sql.includes('.sql'))
 
+    const sqlFilePaths = paths.split(' ').filter(sql => sql.includes('.sql'))
     const ymlFilePaths = paths.split(' ').filter(yml => yml.includes('.yml'))
 
     type SqlYmlFilePairs = {
@@ -25,7 +24,6 @@ async function run(): Promise<void> {
       const yml = ymlFilePaths.find(yml =>
         yml.includes(sqlFile.replace('.sql', ''))
       )
-
       return {
         sqlAsString: fs.readFileSync(sqlFile, 'utf-8'),
         ymlFilePath: yml ?? ''
@@ -34,7 +32,7 @@ async function run(): Promise<void> {
 
     filePairs.map(async pair => {
       const parser = new Parser()
-      parseDbtAsNativeSql(pair.sqlAsString)
+
       const sqlToObject = parser.astify(parseDbtAsNativeSql(pair.sqlAsString))
       const columnNames = sqlToObject.columns
         .map(
@@ -51,6 +49,7 @@ async function run(): Promise<void> {
 
       const ymlColumnNames = await getYmlDetails(pair.ymlFilePath)
       core.debug(`${pair.sqlAsString} \n ${pair.ymlFilePath}`)
+
       const ymlColumnCount = ymlColumnNames.length
       const sqlColumnCount = columnNames.length
       core.debug(
