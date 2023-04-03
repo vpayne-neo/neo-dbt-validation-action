@@ -1,0 +1,2068 @@
+version: 2
+
+models:
+  - name: stg_application_service__adjudication_reports
+    description: application identification data as found in `applicationService.adjudicationReports`
+    meta:
+      contains_pii: true
+    columns:
+      - name: userId
+        description: Unique user Id
+        meta:
+          data_classification: Internal
+      - name: adjudicationReportVersion
+        description: Report version ('version' in src)
+        meta:
+          data_classification: Internal
+      - name: adjudicationReportId
+        description: Adjudication report unique Id ('_id'  in src)
+        meta:
+          data_classification: Internal
+      - name: adjudicationReportDTI
+        description: code for DTI (debt to income) ('DTI' in src)
+        meta:
+          data_classification: Internal
+      - name: adjudicationReportCreditScore
+        description: User credit score ('creditScore' in src)
+        meta:
+          data_classification: Confidential
+      - name: adjudicationReportEmploymentStatus
+        description: User employment status ('employmentStatus' in src)
+        meta:
+          data_classification: Internal
+      - name: adjudicationReportMonthsEmployed
+        description: User months employed ('monthsEmployed' in src)
+        meta:
+          data_classification: Internal
+      - name: adjudicationReportResult
+        description: Adjudication report result (approve, reject) ('result' in src)
+        meta:
+          data_classification: Internal
+      - name: adjudicationReportScenario
+        description: Scenario code (scenario in src)
+        meta:
+          data_classification: Internal
+      - name: adjudicationReportCreditLimitCent
+        description: user credit limit in cents from source creditLimitCents cast to bigInt
+        meta:
+          data_classification: Internal
+      - name: adjudicationReportUpdatedAt
+        description: |
+          '{{ doc("updatedAt") }}'
+          from source updatedAt transformed with to_timestamp()
+        meta:
+          data_classification: Internal
+      - name: adjudicationReportCreatedAt
+        description: |
+          '{{ doc("createdAt") }}'
+           from source createdAt transformed with to_timestamp()
+        meta:
+          data_classification: Internal
+
+  - name: stg_application_service__berbix_id_verification_reports
+    description: Berbix ID verification report data as found in `applicationService.berbixIdVerificationReports`
+    meta:
+      contains_pii: true
+    columns:
+      - name: berbixIdVerificationReportsId
+        description: |
+          unique berbix Verification Report ID
+          ('_id' in src)
+        meta:
+          data_classification: Internal
+      - name: berbixIdVerificationReportsAction
+        description: |
+          Action being taken on the report (accept, review etc.)
+          ('action' in src)
+        meta:
+          data_classification: Internal
+      - name: berbixId
+        description: External unique ID for berbix
+        meta:
+          data_classification: Internal
+      - name: reportsUid
+        description: |
+          Internal customer unique ID
+          ('customer_uid' in src aka userID)
+        meta:
+          data_classification: Internal
+      - name: berbixIdVerificationReportsDashboardUrl
+        description: |
+          Berbix URL to their dashboard for the transaction associated with the document in this collection
+          ('dashboard_url' in src)
+        meta:
+          data_classification: Internal
+      - name: berbixIdVerificationReportsEncryptedIdNumberData
+        description: |
+          encrypted berbix report id number-data
+          ('fields.encrypted_id_number.data' in src)
+        meta:
+          data_classification: Sensitive
+      - name: berbixIdVerificationReportsEncryptedIdNumberDataKey
+        description: |
+          encrypted berbix report id number-data key
+          ('fields.encrypted_id_number.dataKey' in src)
+        meta:
+          data_classification: Sensitive
+      - name: berbixIdVerificationReportsEncryptedIdNumber
+        description: |
+          encrypted berbix report id number-struct
+          ('fields.encrypted_id_number' in src)
+        meta:
+          data_classification: Sensitive
+      - name: berbixIdVerificationReportsIdIssueDateSources
+        description: |
+          berbix report source of Id issue date (has some null values)
+          ('fields.id_issue_date.sources' in src)
+        meta:
+          data_classification: Internal
+      - name: berbixIdVerificationReportsIdIssuerConfidence
+        description: |
+          berbix report confidence ranking for id issuer (low, medium, high)
+          ('fields.id_issuer.confidence' in src)
+        meta:
+          data_classification: Internal
+      - name: berbixIdVerificationReportsIdIssuerOriginalValue
+        description: |
+          Short form of county|country-Prov (has some null/blank values)
+          ('fields.id_issuer.originalValue' in src)
+        meta:
+          data_classification: Internal
+      - name: berbixIdVerificationReportsIdIssuerSources
+        description: |
+          details on the source of berbix verification information, confidence, type, value
+          ('fields.id_issuer.sources' in src)
+        meta:
+          data_classification: Internal
+      - name: berbixIdVerificationReportsIdIssuer
+        description: |
+          Short form of county|country-Prov (has some null/blank values)
+          ('fields.id_issuer.value' in src)
+        meta:
+          data_classification: Internal
+      - name: berbixIdVerificationReportsIdExpiryDateOriginal
+        description: |
+          date in YYYY-MM-DD
+          ('fields.id_expiry_date.originalValue' in src)
+        meta:
+          data_classification: Internal
+      - name: berbixIdVerificationReportsIdTypeConfidence
+        description: |
+          details on the confidence of the Id-Type (low, medium, high)
+          ('fields.id_type.confidence' in src)
+        meta:
+          data_classification: Internal
+      - name: berbixIdVerificationReportsIdTypeOriginalValue
+        description: |
+          Type of ID (DL, PRC, E, UNK, P, ID, [blank], NULL)
+          ('fields.id_type.originalValue' in src)
+        meta:
+          data_classification: Internal
+      - name: berbixIdVerificationReportsIdTypeSources
+        description: |
+          details on confidence, type and value for Id Type Source
+          ('fields.id_type.sources' in src)
+        meta:
+          data_classification: Internal
+      - name: berbixIdVerificationReportsIdType
+        description: |
+          Type of ID (DL, PRC, E, UNK, P, ID, [blank], NULL)
+          ('fields.id_type.value' in src)
+        meta:
+          data_classification: Internal
+      - name: userId
+        description: unique user ID
+        meta:
+          data_classification: Internal
+      - name: berbixIdVerificationReportsAge
+        description: |
+          some unknown age value (not human age as this can be negative??)
+          ('fields.age.value' in src transformed to int)
+        meta:
+          data_classification: Internal
+      - name: berbixIdVerificationReportsCompletedAt
+        description: |
+          date timestamp when the berbix report completed
+          ('completed_at' in src tranformed to timestamp)
+        meta:
+          data_classification: Internal
+      - name: berbixIdVerificationReportsCreatedAt
+        description: |
+          date timestamp when the berbix report was created/started
+          ('createdAt' in src transformed to timestamp)
+        meta:
+          data_classification: Internal
+      - name: berbixIdVerificationReportsIdExpiryDate
+        description: |
+          Date for the Id expiry
+          ('fields.id_expiry_date.value' from src transformed to_date)
+        meta:
+          data_classification: Internal
+      - name: berbixIdVerificationReportsIdIssueDate
+        description: |
+          (assumed) date the id used for verification was issued
+          ('fields.id_issue_date.value' from src transformed to_date)
+        meta:
+          data_classification: Internal
+      - name: berbixIdVerificationReportsOriginalCreatedAt
+        description: |
+          Original createdAt date for berbix report
+          ('originalCreatedAt' from src transformed to_timestamp)
+        meta:
+          data_classification: Internal
+      - name: berbixIdVerificationReportsUpdatedAt
+        description: |
+          backend updatedAt timestamp
+          ('updatedAt' from src transformed to_timestamp)
+        meta:
+          data_classification: Internal
+
+  - name: stg_application_service__comply_advantage_reports
+    description: application data as found in `applicationService.complyAdvantageReport`
+    meta:
+      contains_pii: true
+    columns:
+      - name: complyAdvantageReportId
+        description: unique ID for comply advantage report.  Src field '_id'
+        meta:
+          data_classification: Internal
+      - name: userId
+        description: User identifier associated with application
+        meta:
+          data_classification: Internal
+      - name: complyAdvantageReportContent
+        description: |
+          Comply advantage report content. Extremely big object that
+          contains a field called hits which drive the manual review logic
+        meta:
+          data_classification: Confidential
+      - name: complyAdvantageReportStatus
+        description: Report Status (success)
+        meta:
+          data_classification: Internal
+      - name: complyAdvantageReportCreatedAt
+        description: '{{ doc("createdAt") }}'
+        meta:
+          data_classification: Internal
+      - name: complyAdvantageReportUpdatedAt
+        description: '{{ doc("updatedAt") }}'
+        meta:
+          data_classification: Internal
+
+  - name: stg_application_service__credit_account_applications
+    description: |
+      Historic neo credit application details data as found in `applicationService.creditAccountApplications`
+      New credit application details data can be found in 'creditOnboardingService.creditApplications'
+    meta:
+      contains_pii: true
+    columns:
+      - name: creditAccountApplicationId
+        description: unique ID for neo credit applications, field in source '_id'
+        meta:
+          data_classification: Internal
+      - name: userId
+        description: unique userID for this credit application
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationAllowReapply
+        description: allow repeat credit application (true/false), field in source 'allowReapply'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationDecision
+        description: Application decision, field in source 'decision'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationFlaggedForManualReview
+        description: Application flagged for manual review (true/false), field in source 'flaggedForManualReview'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationInReview
+        description: Application currently in review (true/false), field in source 'inReview'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationIsEligibleForSecuredCredit
+        description: Eligible for a secured credit card, field in source 'isEligibleForSecuredCredit'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationIsProcessing
+        description: Application is processing (true/false), field in source 'isProcessing'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationStatus
+        description: Application status, field in source 'status'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationType
+        description: Type of application for credit, field in source 'type'
+        meta:
+          data_classification: Internal
+      - name: adjudicationReportId
+        description: Id link to the adjuication report, source field 'steps.adjudication.adjudicationReportId'
+        meta:
+          data_classification: Internal
+      - name: berbixIdVerificationReportId
+        description: |
+          ID link to the berbix verificaiton report,
+          source field 'steps.berbixIdVerification.berbixIdVerificationReportId'
+        meta:
+          data_classification: Internal
+      - name: complyAdvantageReportId
+        description: |
+          ID link to the comply advantage report,
+          source field 'steps.complyAdvantageSanctions.complyAdvantageReportId'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationComplyAdvantageReportFlaggedForManualReview
+        description: |
+          flaggged for manual review from comply advantage report,
+          source field 'steps.complyAdvantageSanctions.flaggedForManualReview'
+        meta:
+          data_classification: Internal
+      - name: legalAgreementConsentId
+        description: |
+          ID link to legal agreement consent,
+          source field 'steps.creditDisclosure.data.legalAgreementConsentId'
+        meta:
+          data_classification: Internal
+      - name: enstreamReportId
+        description: |
+          ID link to the enstream report,
+          source field 'steps.enstreamKyc.enstreamReportId'
+        meta:
+          data_classification: Internal
+      - name: iovationDigitalFraudReportId
+        description: |
+          ID link to the iovation Digital Fraud report,
+          source field 'steps.iovationDigitalFraud.iovationDigitalFraudReportId'
+        meta:
+          data_classification: Internal
+      - name: transunionKycReportId
+        description: |
+          ID link to the transunion KYC report,
+          source field 'steps.transunionKyc.transunionKycReportId'
+        meta:
+          data_classification: Internal
+      - name: transunionPersonalFraudReportId
+        description: |
+          ID link to the transunion personal fraud report,
+          source field 'steps.transunionPersonalFraud.transunionPersonalFraudReportId'
+        meta:
+          data_classification: Internal
+      - name: transunionSoftCreditReportId
+        description: |
+          ID link to the transunion soft credit report,
+          source field 'steps.transunionSoftCreditCheck.transunionSoftCreditReportId'
+        meta:
+          data_classification: Internal
+      - name: transunionSoftCreditScore
+        description: Original credit score at application approval
+        meta:
+          data_classification: Internal
+      - name: transunionHardCreditReportId
+        description: |
+          ID link to the transunion hard credit report,
+          source field 'steps.transunionHardCreditCheck.transunionHardCreditReportId'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationEncryptedIdNumber
+        description: |
+          Encrypted ID number from manual identification,
+          source field 'steps.manualIdentification.data.encryptedIdNumber'
+        meta:
+          data_classification: Critical
+      - name: creditAccountApplicationIdProvinceOfIssue
+        description: |
+          Province of issue from manual identification,
+          source field 'steps.manualIdentification.data.idProvinceOfIssue
+        meta:
+          data_classification: Confidential
+      - name: creditAccountApplicationIdType
+        description: |
+          ID type for manual identification,
+          source field 'steps.manualIdentification.data.idType'
+        meta:
+          data_classification: Confidential
+      - name: creditAccountApplicationManualReviewStatus
+        description: |
+          Manual Review status, source field 'steps.manualReview.status
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationManualReviewDecision
+        description: |
+          Manual Review status, source field 'steps.manualReview.decision
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationManualReviewDecisionReason
+        description: |
+          Manual review decision reason, source field 'steps.manualReview.decisionReason
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationOccupation
+        description: |
+          user occupation data, source field 'steps.employment.data.occupation
+        meta:
+          data_classification: Confidential
+      - name: creditAccountApplicationFieldOfStudy
+        description: |
+          Emmployment field data, source field 'steps.employment.data.fieldOfStudy
+        meta:
+          data_classification: Confidential
+      - name: creditAccountApplicationEmploymentStatus
+        description: |
+          User employment status, source field 'steps.employment.data.employmentStatus
+        meta:
+          data_classification: Confidential
+      - name: creditAccountApplicationExpectationSettingStatus
+        description: |
+          User expectation settings
+          source field 'to_date(steps.expectationSetting.status)''
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationVerifyIdDetailsStatus
+        description: |
+          User Id verification status
+          source field 'to_date(steps.verifyIdDetails.status)''
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationCardholderAgreementStatus
+        description: |
+          User cardholder agreement status
+          source field 'to_date(steps.cardholderAgreement.status)''
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationIdExpiryDate
+        description: |
+          manual identification expiry date data,
+          source field 'to_date(steps.manualIdentification.data.expiryDate)''
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationAddressAnsweredAt
+        description: |
+          Address data answered at timeframe,
+          source field 'to_timestamp(steps.address.data.timeFrameAnsweredAt)''
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationCardholderAgreementCompletedAt
+        description: |
+          ICardholder agreement completed at timestamp,
+          source field 'to_timestamp(steps.cardholderAgreement.data.completedAt)''
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationEmploymentAnsweredAt
+        description: |
+          Employment information answered at,
+          source field 'to_timestamp(steps.employment.data.employmentStartTimeFrameAnsweredAt)'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationExpectationSettingCompletedAt
+        description: |
+          Expectation setting completed at timestamp,
+          source field 'to_timestamp(steps.expectationSetting.data.completedAt)'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationIdConfirmedAt
+        description: |
+          Manual Identification confirmed at timestamp,
+          source field 'to_timestamp(steps.manualIdentification.data.confirmedAt)'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationManualReviewDecidedAt
+        description: |
+          Manual review decided at timestamp,
+          source field 'to_timestamp(steps.manualReview.decidedAt)'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationIvccConsentedAt
+        description: |
+          IVCC consent consented at timestamp,
+          source field 'to_timestamp(steps.ivccConsent.data.consentedAt)'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationIDVerifiedAt
+        description: |
+          Verify ID Details verfied at timestamp,
+          source field 'to_timestamp(steps.verifyIdDetails.data.verifiedAt)'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationCreateAccountCompletedAt
+        description: |
+          Account creation completed At timestamp,
+          source field 'to_timestamp(steps.createAccount.data.completedAt)'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationCreatedAt
+        description: |
+          Development (mongo) createdAt timestamp,
+          source field 'to_timestamp(createdAt)''
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationFlaggedForManualReviewAt
+        description: |
+          Timestamp for when the application was flagged for manual review,
+          source field 'to_timestamp(flaggedForManualReviewAt)'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationProcessingStartedAt
+        description: |
+          Application processing started at timestamp,
+          source field 'to_timestamp(processingStartedAt)'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationLastUpdatedAt
+        description: |
+          Developer (mongo) updatedAt timestamp,
+          source field 'to_timestamp(updatedAt)'
+        meta:
+          data_classification: Internal
+
+  - name: stg_application_service__credit_applications
+    description: |
+      Deprecated credit applications, application collection for V0 Neo Standard Application.
+      Has been deprecated in favor of credit account application collection neo credit application
+      details data as found in `applicationService.creditAccountApplications`
+    columns:
+      - name: creditApplicationId
+      - name: userId
+      - name: userOccupation
+      - name: userEmploymentStatus
+      - name: userFieldOfStudy
+      - name: creditApplicationStatus
+      - name: creditApplicationDecision
+      - name: userLastUpdatedAt
+
+  - name: stg_application_service__credit_limit_increase_applications
+    description: |
+      credit limit increase application details data as found in
+      `applicationService.creditLimitIncreaseApplications`
+    meta:
+      contains_pii: false
+    columns:
+      - name: creditAccountLimitIncreaseApplicationId
+        description: |
+          unique ID for credit limit increase applications
+          source field '_id'
+        meta:
+          data_classification: Internal
+      - name: creditAccountId
+        description: Internal credit account Id
+        meta:
+          data_classification: Internal
+      - name: creditAccountLimitIncreaseApplicationDecision
+        description: |
+          Credit limit increase decision (APPROVED | DECLINED)
+          source field 'decision'
+        meta:
+          data_classification: Internal
+      - name: creditAccountLimitIncreaseApplicationStatus
+        description: |
+          Application status (IN_PROGRESS | COMPLETED | ABANDONED)
+          source field 'status'
+        meta:
+          data_classification: Internal
+      - name: creditAccountLimitIncreaseApplicationApplyIncreaseCompletedAt
+        description: |
+          The date the limit increase application was completed.
+          source field 'steps.applyIncrease.data.completedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+
+  - name: stg_application_service__hbc_credit_applications
+    description: |
+      HBC credit (unsecured) account applications data as found in 'applicationService.hbcCreditApplications'
+    meta:
+      contains_pii: true
+    columns:
+      - name: creditAccountApplicationId
+        description: |
+          unique internal ID for the HBC credit account application
+          source field '_id'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationAllowReapply
+        description: |
+          allow repeat credit application (true/false)
+          source field 'allowReapply'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationDecision
+        description: |
+          hbc credit account application decision
+          (APPROVED | NOT_ELIGIBLE | NO_DECISION | PENDING_DECLINE | DECLINED)
+          source field 'decision'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationFlaggedForManualReview
+        description: |
+          Application flagged for manual review (true|false)
+          source field 'flaggedForManualReview'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationInReview
+        description: |
+          Application currently in review (true|false)
+          source field 'inReview'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationIsCreditDeclinedHBCEmployee
+        description: |
+          Credit declined by HBC employee (true|false)
+          source field 'isCreditDeclinedHbcEmployee'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationIsEligibleForSecuredCredit
+        description: |
+          Applicant eligible for secured credit (true|false)
+          source field 'isEligibleForSecuredCredit'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationIsProcessing
+        description: |
+          Application is displaying a loading screen (true|false)
+          source field 'isProcessing'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationStatus
+        description: |
+          Application status (IN_PROGRESS | COMPLETED | ABANDONED)
+          source field 'status'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationType
+        description: |
+          Application type (HBC_APPLICATION)
+          source field 'type'
+        meta:
+          data_classification: Internal
+      - name: adjudicationReportId
+        description: |
+          Linked report id for the adjudication report
+          source field 'steps.adjudication.adjudicationReportId'
+        meta:
+          data_classification: Internal
+      - name: berbixIdVerificationReportId
+        description: |
+          Linked report id for the berbix verification report
+          source field 'steps.berbixIdVerification.berbixIdVerificationReportId'
+        meta:
+          data_classification: Internal
+      - name: complyAdvantageReportId
+        description: |
+          Linked report Id for the comply advantage report
+          source field 'steps.complyAdvantageSanctions.complyAdvantageReportId'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationComplyAdvantageReportFlaggedForManualReview
+        description: |
+          True | False if the application was flagged for manual review
+          source field 'steps.complyAdvantageSanctions.flaggedForManualReview'
+        meta:
+          data_classification: Internal
+      - name: legalAgreementConsentId
+        description: |
+          Link to user sign off for legal agreement consent
+          source field 'steps.creditDisclosure.data.legalAgreementConsentId'
+        meta:
+          data_classification: Internal
+      - name: iovationDigitalFraudReportId
+        description: |
+          Link to iovation digital fraud report
+          source field 'steps.iovationDigitalFraud.iovationDigitalFraudReportId'
+        meta:
+          data_classification: Internal
+      - name: TransunionKycReportId
+        description: |
+          Link to transunion kyc report
+          source field 'steps.transunionKyc.transunionKycReportId'
+        meta:
+          data_classification: Internal
+      - name: transunionPersonalFraudReportId
+        description: |
+          Link to transunion personal fraud report
+          source field 'steps.transunionPersonalFraud.transunionPersonalFraudReportId'
+        meta:
+          data_classification: Internal
+      - name: transunionSoftCreditReportId
+        description: |
+          link to transunion soft credit check report
+          source field 'steps.transunionSoftCreditCheck.transunionSoftCreditReportId'
+        meta:
+          data_classification: Internal
+      - name: transunionSoftCreditScore
+        description: Original credit score at application approval
+        meta:
+          data_classification: Internal
+      - name: transunionHardCreditReportId
+        description: |
+          link to transunion hard credit check report
+          source field 'steps.transunionHardCreditCheck.transunionHardCreditReportId'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationOccupation
+        description: |
+          User occupation information for application
+          source field 'steps.employment.data.occupation'
+        meta:
+          data_classification: Confidential
+      - name: creditAccountApplicationFieldOfStudy
+        description: |
+          User field of study information for application
+          source field 'steps.employment.data.fieldOfStudy'
+        meta:
+          data_classification: Confidential
+      - name: creditAccountApplicationEmploymentStatus
+        description: |
+          User employment status information for application
+          source field 'steps.employment.data.employmentStatus'
+        meta:
+          data_classification: Confidential
+      - name: userId
+        description: unique userID associated with the hbc credit application
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationPreQualifyCreditLimitCents
+        description: |
+          Information on the applications prequalification amount in cents
+          source field 'steps.adjudication.data.hbcPreQualifyCreditLimitCents' converted to bigint
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationManualReviewStatus
+        description: |
+          Status for manual review (NOT_RUN | COMPLETED | SKIPPED)
+          source field 'steps.manualReview.status'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationManualReviewDecision
+        description: |
+          decision from manual review
+          (APPROVED | NO_DECISION | APPROVED_FOR_SECURED | DECLINED)
+          source field 'steps.manualReview.decision'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationManualReviewDecisionReason
+        description: |
+          Manual review decision reason
+          source field 'steps.manualReview.decisionReason'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationAddressAnsweredAt
+        description: |
+          Address data timestamp for when information supplied
+          source field 'steps.address.data.timeFrameAnsweredAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationCardholderAgreementCompletedAt
+        description: |
+          Cardholder agreement timestamp for when completed
+          source field 'steps.cardholderAgreement.data.completedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationEmploymentAnsweredAt
+        description: |
+          Employment information timestamp for when information supplied
+          source field 'steps.employment.data.employmentStartTimeFrameAnsweredAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationExpectationSettingCompletedAt
+        description: |
+          Timestamp for application expectation setting information
+          source field 'steps.expectationSetting.data.completedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationManualReviewDecidedAt
+        description: |
+          Manual review decision timestamp
+          source field 'steps.manualReview.decidedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationIvccConsentedAt
+        description: |
+          Timestamp for when IVCC consent was given
+          source field 'steps.ivccConsent.data.consentedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationLoyaltyMarketingContactConsentedAt
+        description: |
+          Timestamp for when loyalty account marketing contact agreement was given
+          source field 'steps.loyaltyAccount.data.marketingContactAgreement.consentedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationLoyaltyPrivacyPolicyConsentedAt
+        description: |
+          Timestamp for when loyalty account privacy policy agreement was given
+          source field 'steps.loyaltyAccount.data.privacyPolicyAgreement.consentedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationLoyaltyTermsAndConditionsConsentedAt
+        description: |
+          Timestamp for loyalty account terms and conditions agreement consent
+          source field 'steps.loyaltyAccount.data.termsAndConditionsAgreement.consentedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationIDVerifiedAt
+        description: |
+          Timestamp for when the applicants Id was verified
+          source field 'steps.verifyIdDetails.data.verifiedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationCreateAccountCompletedAt
+        description: |
+          Timestamp of when the account was created
+          source field 'steps.createAccount.data.completedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationCreatedAt
+        description: |
+          Developer timestamp from mongo - createdAT
+          source field 'createdAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationFlaggedForManualReviewAt
+        description: |
+          Timestamp for when the application was flagged for manual review
+          source field 'flaggedForManualReviewAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationProcessingStartedAt
+        description: |
+          Timestamp for when the application started being processed.
+          source field 'processingStartedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationLastUpdatedAt
+        description: |
+          Developer timestamp from mongo - UpdatedAt
+          source field 'updatedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+
+  - name: stg_application_service__hbc_instore_credit_applications
+    description: |
+      In-store HBC credit account application data as found in `applicationService.hbcInstoreCreditApplications`
+    meta:
+      contains_pii: true
+    columns:
+      - name: creditAccountApplicationId
+        description: |
+          unique ID for HBC instore unsecured credit account application
+          source field '_id'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationContactInformationEmail
+        description: |
+          Applicant email information
+          source field 'contactinformation.email'
+        meta:
+          data_classification: Confidential
+      - name: associateId
+        description: |
+          ID of the inhouse HBC associate assisting with the application
+          source field 'steps.associatedetails.data.Storeassociateid'
+        meta:
+          data_classification: Internal
+      - name: applicationAssociateStoreId
+        description: |
+          Store ID of where the application was completed
+          source field 'steps.associatedetails.data.storeid'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationAllowReapply
+        description: |
+          allow repeat credit application (true/false)
+          source field 'allowReapply'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationDecision
+        description: |
+          hbc credit account application decision
+          (APPROVED | NOT_ELIGIBLE | NO_DECISION | PENDING_DECLINE | DECLINED)
+          source field 'decision'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationFlaggedForManualReview
+        description: |
+          Application flagged for manual review (true|false)
+          source field 'flaggedForManualReview'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationInReview
+        description: |
+          Application currently in review (true|false)
+          source field 'inReview'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationIsCreditDeclinedHBCEmployee
+        description: |
+          Credit declined by HBC employee (true|false)
+          source field 'isCreditDeclinedHbcEmployee'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationIsEligibleForSecuredCredit
+        description: |
+          Applicant eligible for secured credit (true|false)
+          source field 'isEligibleForSecuredCredit'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationIsProcessing
+        description: |
+          Application is displaying a loading screen (true|false)
+          source field 'isProcessing'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationStatus
+        description: |
+          Application status (IN_PROGRESS | COMPLETED | ABANDONED)
+          source field 'status'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationType
+        description: |
+          Application type (HBC_IN_STORE_APPLICATION)
+          source field 'type'
+        meta:
+          data_classification: Internal
+      - name: adjudicationReportId
+        description: |
+          Linked report id for the adjudication report
+          source field 'steps.adjudication.adjudicationReportId'
+        meta:
+          data_classification: Internal
+      - name: complyAdvantageReportId
+        description: |
+          Linked report Id for the comply advantage report
+          source field 'steps.complyAdvantageSanctions.complyAdvantageReportId'
+        meta:
+          data_classification: Internal
+      - name: legalAgreementConsentId
+        description: |
+          Link to user sign off for legal agreement consent
+          source field 'steps.creditDisclosure.data.legalAgreementConsentId'
+        meta:
+          data_classification: Internal
+      - name: iovationDigitalFraudReportId
+        description: |
+          Link to iovation digital fraud report
+          source field 'steps.iovationDigitalFraud.iovationDigitalFraudReportId'
+        meta:
+          data_classification: Internal
+      - name: transunionKycReportId
+        description: |
+          Link to transunion kyc report
+          source field 'steps.transunionKyc.transunionKycReportId'
+        meta:
+          data_classification: Internal
+      - name: transunionPersonalFraudReportId
+        description: |
+          Link to transunion personal fraud report
+          source field 'steps.transunionPersonalFraud.transunionPersonalFraudReportId'
+        meta:
+          data_classification: Internal
+      - name: transunionSoftCreditReportId
+        description: |
+          link to transunion soft credit check report
+          source field 'steps.transunionSoftCreditCheck.transunionSoftCreditReportId'
+        meta:
+          data_classification: Internal
+      - name: transunionSoftCreditScore
+        description: Original credit score at application approval
+        meta:
+          data_classification: Internal
+      - name: transunionHardCreditReportId
+        description: |
+          link to transunion hard credit check report
+          source field 'steps.transunionHardCreditCheck.transunionHardCreditReportId'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationManualReviewStatus
+        description: |
+          Status for manual review (NOT_RUN | COMPLETED | SKIPPED) source field 'steps.manualReview.status'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationManualReviewDecision
+        description: |
+          decision from manual review (APPROVED | NO_DECISION | APPROVED_FOR_SECURED | DECLINED)
+          source field 'steps.manualReview.decision'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationManualReviewDecisionReason
+        description: |
+          Manual review decision reason
+          source field 'steps.manualReview.decisionReason'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationIdType
+        description: |
+          Type of ID used by application
+          (PROVINCIAL_ID_CARD | PERMANENT_RESIDENCE_CARD | DRIVERS_LICENSE | PASSPORT | NULL)
+          source field 'steps.pointOfSaleIdentification.data.idType'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationOccupation
+        description: |
+          User occupation information for application
+          source field 'steps.employment.data.occupation'
+        meta:
+          data_classification: Confidential
+      - name: creditAccountApplicationFieldOfStudy
+        description: |
+          User field of study information for application
+          source field 'steps.employment.data.fieldOfStudy'
+        meta:
+          data_classification: Confidential
+      - name: creditAccountApplicationEmploymentStatus
+        description: |
+          User employment status information for application
+          (STUDNET | RETIRED | EMPLOYED | UNEMPLOYED | SELF_EMPLOYED| NULL)
+          source field 'steps.employment.data.employmentStatus'
+        meta:
+          data_classification: Confidential
+      - name: userId
+        description: |
+          unique userID for this application
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationComplyAdvantageReportFlaggedForManualReview
+        description: |
+          Application flagged for manual review (true|false)
+          source field 'steps.complyAdvantageSanctions.flaggedForManualReview'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationEncryptedIdNumber
+        description: |
+          Encrypted applicant ID number
+          source field 'steps.pointOfSaleIdentification.data.encryptedIdNumber'
+        meta:
+          data_classification: Sensitive
+      - name: creditAccountApplicationIdProvinceOfIssue
+        description: |
+          Province ID was issued from
+          source field 'steps.pointOfSaleIdentification.data.idProvinceOfIssue'
+        meta:
+          data_classification: Confidential
+      - name: creditAccountApplicationPreQualifyCreditLimitCents
+        description: |
+          Information on the applications prequalification amount in cents
+          source field 'steps.adjudication.data.hbcPreQualifyCreditLimitCents' converted to bigint
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationExpectationSettingStatus
+        description: |
+          User expectation settings status
+          source field 'steps.expectationSetting.status'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationVerifyIdDetailsStatus
+        description: |
+          User Id verification status
+          source field 'steps.verifyIdDetails.status'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationCardholderAgreementStatus
+        description: |
+          User cardholder agreement status
+          source field 'steps.cardholderAgreement.status'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationHbcLoyaltyAccountStatus
+        description: |
+          User Hbc loyalty account status
+          source field 'steps.loyaltyAccount.status'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationHbcLoyaltyAccountRewardsTier
+        description: |
+          User hbc loyalty account rewards tier
+          source field 'steps.loyaltyAccount.data.rewardsTier'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationCreatedAt
+        description: |
+          Developer timestamp from mongo - createdAT
+          source field 'createdAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationFlaggedForManualReviewAt
+        description: |
+          Timestamp for when the application was flagged for manual review
+          source field 'flaggedForManualReviewAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationProcessingStartedAt
+        description: |
+          Timestamp for when the application started being processed.
+          source field 'processingStartedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationLastUpdatedAt
+        description: |
+          Developer timestamp from mongo - updatedAt
+          source field 'updatedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationAddressAnsweredAt
+        description: |
+          Address data timestamp for when information supplied
+          source field 'steps.address.data.timeFrameAnsweredAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationCardholderAgreementCompletedAt
+        description: |
+          Cardholder agreement timestamp for when completed
+          source field 'steps.cardholderAgreement.data.completedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationEmploymentAnsweredAt
+        description: |
+          Employment information timestamp for when information supplied
+          source field 'steps.employment.data.employmentStartTimeFrameAnsweredAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationExpectationSettingCompletedAt
+        description: |
+          Timestamp for application expectation setting information
+          source field 'steps.expectationSetting.data.completedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationManualReviewDecidedAt
+        description: |
+          Manual review decision timestamp
+          source field 'steps.manualReview.decidedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationIvccConsentedAt
+        description: |
+          Timestamp for when IVCC consent was given
+          source field 'steps.ivccConsent.data.consentedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationLoyaltyMarketingContactConsentedAt
+        description: |
+          Timestamp for when loyalty account marketing contact agreement was given
+          source field 'steps.loyaltyAccount.data.marketingContactAgreement.consentedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationLoyaltyPrivacyPolicyConsentedAt
+        description: |
+          Timestamp for when loyalty account privacy policy agreement was given
+          source field 'steps.loyaltyAccount.data.privacyPolicyAgreement.consentedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationLoyaltyTermsAndConditionsConsentedAt
+        description: |
+          Timestamp for loyalty account terms and conditions agreement consent
+          source field 'steps.loyaltyAccount.data.termsAndConditionsAgreement.consentedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationStatementOptionsDecidedAt
+        description: |
+          Statement option decision timestamp
+          source field 'steps.statementOptions.data.decidedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationIdConfirmedAt
+        description: |
+          Point of sale identification confirmed timestamp
+          source field 'steps.pointOfSaleIdentification.data.confirmedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationIdVerifiedAt
+        description: |
+          Timestamp for when the applicants Id was verified
+          source field 'steps.verifyIdDetails.data.verifiedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationCreateAccountCompletedAt
+        description: |
+          Applicant account created at timestamp
+          source field 'steps.createAccount.data.completedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationIdExpiryDate
+        description: |
+          Expiry date of point of sale (POS) ID
+          source field 'steps.pointOfSaleIdentification.data.expiryDate' converted to timestamp
+        meta:
+          data_classification: Confidential
+
+  - name: stg_application_service__identifications
+    description: application identification data as found in `applicationService.identifications`
+    meta:
+      contains_pii: true
+    columns:
+      - name: identificationId
+        description: |
+          unique identifier for each record in the table, for each application identification.
+          source field '_id'
+      - name: userId
+        description: Identifier for user in the table.
+      - name: identificationSource
+        description: |
+          the source through which the identification was provided/handled; currently mostly through Berbix.
+          source field 'source'
+        meta:
+          data_classification: Internal
+      - name: identificationType
+        description: |
+          The type of identification that the user provided (GOVERNMENT_ISSUED_ID | DRIVERS_LICENSE | PASSPORT |UNKNOWN)
+          source field 'type'
+        meta:
+          data_classification: Internal
+      - name: identificationEncryptedNumber
+        description: |
+          A struct field that contains both the ID number hash-encrypted, and the decryption key.
+          source field 'encryptedNumber'
+        meta:
+          data_classification: Sensitive
+      - name: identificationExpiresAt
+        description: |
+          The timestamp at which the identification provided expires.
+          source field 'expiresAt' converted to timestamp
+        meta:
+          data_classification: Confidential
+      - name: identificationUpdatedAt
+        description: '{{ doc("updatedAt")}}'
+        meta:
+          data_classification: Internal
+
+  - name: stg_application_service__iovation_digital_fraud_reports
+    description: |
+      application iovation digitial fraud report data as found in `applicationService.iovationDigitalFraudReports`
+    meta:
+      contains_pii: false
+    columns:
+      - name: iovationDigitalFraudReportId
+        description: |
+          Unique ID for the iovation digitial fraud report
+          source field  '_id'
+        meta:
+          data_classification: Internal
+      - name: userId
+        description: |
+          unique userID linked to the iovation digital fraud report
+        meta:
+          data_classification: Internal
+      - name: iovationDigitalFraudReportCreatedAt
+        description: |
+          Developer timestamp from mongo - createdAT
+          source field 'createdAt' converted to timestamp
+        meta:
+          data_classification: Internal
+
+  - name: stg_application_service__legal_agreement_consents
+    description: |
+      application legal agreement consents data as found in `applicationService.legalAgreementConsents`
+    meta:
+      contains_pii: false
+    columns:
+      - name: legalAgreementConsentId
+        description: |
+          Unique ID for the legal agreement consent record
+          source field '_id'
+        meta:
+          data_classification: Internal
+      - name: userId
+        description: |
+          Unique userID linked to the legal agreement consent
+        meta:
+          data_classification: Internal
+      - name: legalAgreementConsentCreatedAt
+        description: |
+          Developer timestamp from mongo - createdAT
+          source field 'createdAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: legalAgreementConsentConsentedAt
+        description: |
+          Timestamp of when the legal agreement was constented to
+          source field 'consentedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+
+  - name: stg_application_service__savings_account_applications
+    description: |
+      Historic money account application data as found in `applicationService.savingsAccountApplications`
+      New money account application data can be found in 'savingsOnboardingService.savingsApplications'
+    meta:
+      contains_pii: true
+    columns:
+      - name: moneyAccountApplicationId
+      - name: userId
+      - name: moneyAccountApplicationDecision
+      - name: moneyAccountApplicationFlaggedForManualReview
+      - name: moneyAccountApplicationInReview
+      - name: moneyAccountApplicationIsProcessing
+      - name: moneyAccountApplicationStatus
+      - name: berbixIdVerificationReportId
+      - name: complyAdvantageReportId
+      - name: moneyAccountApplicationComplyAdvantageReportFlaggedForManualReview
+      - name: enstreamReportId
+      - name: iovationDigitalFraudReportId
+      - name: transunionKycReportId
+      - name: transunionPersonalFraudReportId
+      - name: moneyAccountApplicationManualReviewStatus
+      - name: moneyAccountApplicationManualReviewDecision
+      - name: moneyAccountApplicationManualReviewDecisionReason
+      - name: moneyAccountApplicationEmploymentAnsweredAt
+      - name: moneyAccountApplicationExpectationSettingCompletedAt
+      - name: moneyAccountApplicationManualReviewDecidedAt
+      - name: moneyAccountIvccConsentedAt
+      - name: moneyAccountApplicationIDVerifiedAt
+      - name: moneyAccountApplicationCreatedAt
+      - name: moneyAccountApplicationProcessingStartedAt
+      - name: moneyAccountApplicationLastUpdatedAt
+
+  - name: stg_application_service__secured_HBC_credit_account_applications
+    description: |
+      Secured HBC credit application data as found in `applicationService.hbcSecuredCreditApplications`
+    meta:
+      contains_pii: true
+    columns:
+      - name: creditAccountApplicationId
+        description: |
+          Unique ID for the secured HBC credit account application
+          source field '_id'
+        meta:
+          data_classification: Internal
+      - name: userId
+        description: |
+          unique UserID linked to the secured HBC credit application
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationAllowReapply
+        description: |
+          allow repeat secured credit application (true/false)
+          source field 'allowReapply'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationDecision
+        description: |
+          hbc secured credit account application decision
+          (APPROVED | NOT_ELIGIBLE | NO_DECISION | PENDING_DECLINE | DECLINED)
+          source field 'decision'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationFlaggedForManualReview
+        description: |
+          True | False if the application was flagged for manual review
+          source field 'flaggedForManualReview'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationInReview
+        description: |
+          Application currently in review (true|false)
+          source field 'inReview'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationIsProcessing
+        description: |
+          Application is displaying a loading screen (true|false)
+          source field 'isProcessing'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationOnboardingSource
+        description: |
+          Source of applicant onboarding (STANDARD | DIRECT | IN_STORE)
+          source field 'onboardingSource'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationStatus
+        description: |
+          Application status (IN_PROGRESS | COMPLETED | ABANDONED)
+          source field 'status'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationType
+        description: |
+          Application type (HBC_SECURED_APPLICATION)
+          source field 'type'
+        meta:
+          data_classification: Internal
+      - name: berbixIdVerificationReportId
+        description: |
+          Linked report id for the berbix verification report
+          source field 'steps.berbixIdVerification.berbixIdVerificationReportId'
+        meta:
+          data_classification: Internal
+      - name: complyAdvantageReportId
+        description: |
+          Linked report Id for the comply advantage report
+          source field 'steps.complyAdvantageSanctions.complyAdvantageReportId'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationComplyAdvantageReportFlaggedForManualReview
+        description: |
+          True | False if the application was flagged for manual review
+          source field 'steps.complyAdvantageSanctions.flaggedForManualReview'
+        meta:
+          data_classification: Internal
+      - name: legalAgreementConsentId
+        description: |
+          Link to user sign off for legal agreement consent
+          source field 'steps.creditDisclosure.data.legalAgreementConsentId'
+        meta:
+          data_classification: Internal
+      - name: iovationDigitalFraudReportId
+        description: |
+          Link to iovation digital fraud report
+          source field 'steps.iovationDigitalFraud.iovationDigitalFraudReportId'
+        meta:
+          data_classification: Internal
+      - name: transunionKycReportId
+        description: |
+          Link to transunion kyc report
+          source field 'steps.transunionKyc.transunionKycReportId'
+        meta:
+          data_classification: Internal
+      - name: transunionPersonalFraudReportId
+        description: |
+          Link to transunion personal fraud report
+          source field 'steps.transunionPersonalFraud.transunionPersonalFraudReportId'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationManualReviewStatus
+        description: |
+          Status for manual review (NOT_RUN | COMPLETED | SKIPPED)
+          source field 'steps.manualReview.status'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationManualReviewDecision
+        description: |
+          decision from manual review (APPROVED | NO_DECISION | APPROVED_FOR_SECURED | DECLINED)
+          source field 'steps.manualReview.decision'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationManualReviewDecisionReason
+        description: |
+          Manual review decision reason
+          source field 'steps.manualReview.decisionReason'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationOccupation
+        description: |
+          User occupation information for application
+          source field 'steps.employment.data.occupation'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationFieldOfStudy
+        description: |
+          User field of study information for application
+          source field 'steps.employment.data.fieldOfStudy'
+        meta:
+          data_classification: Confidential
+      - name: creditAccountApplicationEmploymentStatus
+        description: |
+          User employment status information for application
+          source field 'steps.employment.data.employmentStatus'
+        meta:
+          data_classification: Confidential
+      - name: creditAccountApplicationExpectationSettingStatus
+        description: |
+          User expectation settings status
+          source field 'steps.expectationSetting.status'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationVerifyIdDetailsStatus
+        description: |
+          User Id verification details status
+          source field 'steps.verifyIdDetails.status'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationCardholderAgreementStatus
+        description: |
+          User cardholder agreement status
+          source field 'steps.cardholderAgreement.status'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationFundSecuredAccountStatus
+        description: |
+          User fund secured account status
+          source field 'steps.fundSecuredAccount.status'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationHbcLoyaltyAccountStatus
+        description: |
+          User HBC loyalty account status
+          source field 'steps.loyaltyAccount.status'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationHbcLoyaltyAccountRewardsTier
+        description: |
+          User HBC loyalty account rewards tier
+          source field 'steps.loyaltyAccount.data.rewardsTier'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationAddressAnsweredAt
+        description: |
+          Address data timestamp for when information supplied
+          source field 'steps.address.data.timeFrameAnsweredAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationCardholderAgreementCompletedAt
+        description: |
+          Cardholder agreement timestamp for when completed
+          source field 'steps.cardholderAgreement.data.completedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationEmploymentAnsweredAt
+        description: |
+          Employment information timestamp for when information supplied
+          source field 'steps.employment.data.employmentStartTimeFrameAnsweredAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationExpectationSettingCompletedAt
+        description: |
+          Timestamp for application expectation setting information
+          source field 'steps.expectationSetting.data.completedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationManualReviewDecidedAt
+        description: |
+          Manual review decision timestamp
+          source field 'steps.manualReview.decidedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationIvccConsentedAt
+        description: |
+          Timestamp for when IVCC consent was given
+          source field 'steps.ivccConsent.data.consentedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationIDVerifiedAt
+        description: |
+          Timestamp for when the applicants Id was verified
+          source field 'steps.verifyIdDetails.data.verifiedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationCreateAccountCompletedAt
+        description: |
+          Timestamp of when the account was application was completed
+          source field 'steps.createAccount.data.completedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationLoyaltyMarketingContactConsentedAt
+        description: |
+          Timestamp for when loyalty account marketing contact agreement was given
+          source field 'steps.loyaltyAccount.data.marketingContactAgreement.consentedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationLoyaltyPrivacyPolicyConsentedAt
+        description: |
+          Timestamp for when loyalty account privacy policy agreement consent was given
+          source field 'steps.loyaltyAccount.data.privacyPolicyAgreement.consentedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationLoyaltyTermsAndConditionsConsentedAt
+        description: |
+          Timestamp for loyalty account terms and conditions agreement consent source field
+          'steps.loyaltyAccount.data.termsAndConditionsAgreement.consentedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationCreatedAt
+        description: |
+          Developer timestamp from mongo - createdAT
+          source field 'createdAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationFlaggedForManualReviewAt
+        description: |
+          Timestamp for when the application was flagged for manual review
+          source field 'flaggedForManualReviewAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationProcessingStartedAt
+        description: |
+          Timestamp for when the application started being processed.
+          source field 'processingStartedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationLastUpdatedAt
+        description: |
+          Developer timestamp from mongo - updatedAT
+          source field 'updatedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+
+  - name: stg_application_service__secured_neo_credit_account_applications
+    description: |
+      application identification data as found in `applicationService.neoSercuredCreditApplications`
+    meta:
+      contains_pii: true
+    columns:
+      - name: creditAccountApplicationId
+        description: |
+          unique ID for the secured neo credit account application
+          source field '_id'
+        meta:
+          data_classification: Internal
+      - name: userId
+        description: |
+          unique userID for this application
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationAllowReapply
+        description: |
+          allow repeat credit application (true/false)
+          source field 'allowReapply'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationDecision
+        description: |
+          neo secured credit account application decision
+          (APPROVED | NOT_ELIGIBLE | NO_DECISION | PENDING_DECLINE | DECLINED)
+          source field 'decision'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationFlaggedForManualReview
+        description: |
+          Application flagged for manual review (true|false)
+          source field 'flaggedForManualReview'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationInReview
+        description: |
+          Application currently in review (true|false)
+          source field 'inReview'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationIsProcessing
+        description: |
+          Application is displaying a loading screen (true|false)
+          source field 'isProcessing'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationOnboardingSource
+        description: |
+          The onboarding source for the application (STANDARD | DIRECT)
+          source field 'onboardingSource'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationStatus
+        description: |
+          Application status (IN_PROGRESS | COMPLETED | ABANDONED)
+          source field 'status'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationType
+        description: |
+          Application type (NEO_SECURED_APPLICATION)
+          source field 'type'
+        meta:
+          data_classification: Internal
+      - name: berbixIdVerificationReportId
+        description: |
+          Linked report id for the berbix verification report
+          source field 'steps.berbixIdVerification.berbixIdVerificationReportId'
+        meta:
+          data_classification: Internal
+      - name: complyAdvantageReportId
+        description: |
+          Linked report Id for the comply advantage report
+          source field 'steps.complyAdvantageSanctions.complyAdvantageReportId'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationComplyAdvantageReportFlaggedForManualReview
+        description: |
+          True | False if the application was flagged for manual review
+          source field 'steps.complyAdvantageSanctions.flaggedForManualReview'
+        meta:
+          data_classification: Internal
+      - name: legalAgreementConsentId
+        description: |
+          Link to user sign off for legal agreement consent
+          source field 'steps.creditDisclosure.data.legalAgreementConsentId'
+        meta:
+          data_classification: Internal
+      - name: iovationDigitalFraudReportId
+        description: |
+          Link to iovation digital fraud report
+          source field 'steps.iovationDigitalFraud.iovationDigitalFraudReportId'
+        meta:
+          data_classification: Internal
+      - name: transunionKycReportId
+        description: |
+          Link to transunion kyc report
+          source field 'steps.transunionKyc.transunionKycReportId'
+        meta:
+          data_classification: Internal
+      - name: transunionPersonalFraudReportId
+        description: |
+          Link to transunion personal fraud report
+          source field 'steps.transunionPersonalFraud.transunionPersonalFraudReportId'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationManualReviewStatus
+        description: |
+          Status for manual review (NOT_RUN | COMPLETED | SKIPPED)
+          source field 'steps.manualReview.status'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationManualReviewDecision
+        description: |
+          decision from manual review (APPROVED | NO_DECISION | APPROVED_FOR_SECURED | DECLINED)
+          source field 'steps.manualReview.decision'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationManualReviewDecisionReason
+        description: |
+          Manual review decision reason
+          source field 'steps.manualReview.decisionReason'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationOccupation
+        description: |
+          User occupation information for application
+          source field 'steps.employment.data.occupation'
+        meta:
+          data_classification: Confidential
+      - name: creditAccountApplicationFieldOfStudy
+        description: |
+          User field of study informaiton for application
+          source field 'steps.employment.data.fieldOfStudy'
+        meta:
+          data_classification: Confidential
+      - name: creditAccountApplicationEmploymentStatus
+        description: |
+          User employment status information for application (STUDENT|RETIRED|EMPLOYED|UNEMPLOYED|SELF_EMPLOYED|NULL)
+          source field 'steps.employment.data.employmentStatus'
+        meta:
+          data_classification: Confidential
+      - name: creditAccountApplicationExpectationSettingStatus
+        description: |
+          User expectation settings status
+          source field 'steps.expectationSetting.status'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationVerifyIdDetailsStatus
+        description: |
+          User Id verification status
+          source field 'steps.verifyIdDetails.status'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationCardholderAgreementStatus
+        description: |
+          User cardholder agreement status
+          source field 'steps.cardholderAgreement.status'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationFundSecuredAccountStatus
+        description: |
+          User fund secured account status
+          source field 'steps.fundSecuredAccount.status'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationAddressAnsweredAt
+        description: |
+          Address data timestamp for when information supplied
+          source field 'steps.address.data.timeFrameAnsweredAt converted to timestamp'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationCardholderAgreementCompletedAt
+        description: |
+          Cardholder agreement timestamp for when completed
+          source field 'steps.cardholderAgreement.data.completedAt converted to timestamp'
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationEmploymentAnsweredAt
+        description: |
+          Employment information timestamp for when information supplied
+          source field 'steps.employment.data.employmentStartTimeFrameAnsweredAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationExpectationSettingCompletedAt
+        description: |
+          Timestamp for application expectation setting information
+          source field 'steps.expectationSetting.data.completedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationManualReviewDecidedAt
+        description: |
+          Manual review decision timestamp
+          source field 'steps.manualReview.decidedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationIvccConsentedAt
+        description: |
+          Timestamp for when IVCC constent was given
+          source field 'steps.ivccConsent.data.consentedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationIDVerifiedAt
+        description: |
+          Timestamp for when the applicants Id was verified
+          source field 'steps.verifyIdDetails.data.verifiedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationCreatedAt
+        description: |
+          Developer timestamp from mongo - createdAT
+          source field 'createdAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationFlaggedForManualReviewAt
+        description: |
+          Timestamp for when the application was flagged for manual review
+          source field 'flaggedForManualReviewAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationProcessingStartedAt
+        description: |
+          Timestamp for when the application started being processed.
+          source field 'processingStartedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationLastUpdatedAt
+        description: |
+          Developer timestamp from mongo - UpdatedAt
+          source field 'updatedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: creditAccountApplicationCreateAccountCompletedAt
+        description: |
+          Timestamp of when the account was created
+          source field 'steps.createAccount.data.completedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+
+  - name: stg_application_service__transunion_hard_credit_reports
+    description: |
+      application identification data as found in `applicationService.transunionHardCreditReports`
+    meta:
+      contains_pii: false
+    columns:
+      - name: _id as transunionHardCreditReportId
+        description: |
+          unique ID for the transunion hard credit report
+          source field '_id'
+        meta:
+          data_classification: Internal
+      - name: transunionHardCreditReportMemberCode
+        description: |
+          Transuion hard credit member code
+          source field 'memberCode'
+        meta:
+          data_classification: Internal
+      - name: transunionHardCreditReportUpdatedAt
+        description: |
+          Developer timestamp from mongo - UpdatedAt
+          source field 'updatedAt'
+        meta:
+          data_classification: Internal
+      - name: userId
+        description: |
+          unique UserID linked to this transunion hard credit report
+        meta:
+          data_classification: Internal
+      - name: transunionUserReference
+        description: |
+          User Id as reference
+          source field 'userReference'
+        meta:
+          data_classification: Internal
+      - name: transunionHardCreditReportCreatedAt
+        description: |
+          Developer timestamp from mongo - createdAT
+          source field 'createdAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: transunionHardCreditReportDate
+        description: |
+          YYYY-MM-DD timestamp (UTC)
+          source field 'date' converted to date
+        meta:
+          data_classification: Internal
+
+  - name: stg_application_service__transunion_personal_fraud_reports
+    description: |
+      application identification data as found in `applicationService.transunionPersonalFraudReports`
+    meta:
+      contains_pii: false
+    columns:
+      - name: transunionPersonalFraudReportId
+        description: |
+          Unique ID for the transunion personal fraud report
+          source field '_id'
+        meta:
+          data_classification: Internal
+      - name: userId
+        description: |
+          unique user ID for the transunion personal fraud report
+        meta:
+          data_classification: Internal
+      - name: transunionUserReferenceId
+        description: |
+          Reference ID for the user
+          source field 'userReferenceId'
+        meta:
+          data_classification: Internal
+      - name: transunionPersonalFraudReportCreatedAt
+        description: |
+          Developer timestamp from mongo - createdAT
+          source field 'createdAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: transunionPersonalFraudReportUpdatedAt
+        description: |
+          Developer timestamp from mongo - updatedAT
+          source field 'updatedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+
+  - name: stg_application_service__transunion_soft_credit_reports
+    description: |
+      transunion soft credit report data as found in `applicationService.transunionSoftCreditReports`
+    meta:
+      contains_pii: true
+    columns:
+      - name: userId
+        description: |
+          Unique userID linked to the transunion soft credit report
+        meta:
+          data_classification: Internal
+      - name: transunionSoftCreditReportId
+        description: |
+          Unique Id for the transunion soft credit report
+          source field '_id'
+        meta:
+          data_classification: Internal
+      - name: transunionSoftCreditReportMemberCode
+        description: |
+          The member code for the transunion soft credit report such as (975ZZ30134 | FZ97859612)
+          source field 'memberCode'
+        meta:
+          data_classification: Internal
+      - name: transunionSoftCreditReportDetails
+        description: |
+          Transunion report details such as Code values, address details, user names, user phone numbers etc.
+          source field 'details'
+        meta:
+          data_classification: Confidential
+      - name: transunionSoftCreditReportUpdatedAt
+        description: |
+          Developer timestamp from mongo - UpdatedAt
+          source field 'updatedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: transunionUserReference
+        description: |
+          Reference of the userID as noted above
+          source field 'userReference'
+        meta:
+          data_classification: Internal
+      - name: transunionSoftCreditReportNewPhoneNumber
+        description: |
+          Primary phone number for the user
+          source field 'details.phones.phone[0]'
+        meta:
+          data_classification: Confidential
+      - name: transunionSoftCreditReportPhoneType
+        description: |
+          The type of phone number supplied such as (Employment | Personal | Null)
+          source field 'details.phones.phoneType[0]'
+        meta:
+          data_classification: Confidential
+      - name: transunionSoftCreditReportCreatedAt
+        description: |
+          Developer timestamp from mongo - createdAt
+          source field 'createdAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: transunionSoftCreditReportDate
+        description: |
+          YYYY-MM-DD timestamp (UTC)
+          source field 'date' converted to date
+        meta:
+          data_classification: Internal
+
+  - name: stg_application_service__transunion_kyc_reports
+    description: |
+      transunion KYC report data as found in `applicationService.transunionKycReports`
+    meta:
+      contains_pii: true
+    columns:
+      - name: userId
+        description: |
+          Unique userID linked to the transunion kyc report
+        meta:
+          data_classification: Internal
+      - name: transunionKycReportId
+        description: |
+          Unique Id for the transunion kyc report
+          source field '_id'
+        meta:
+          data_classification: Internal
+      - name: aml as transunionKycReportAml
+        description: |
+          AML data fields linked to the transunion kyc report
+          source field 'aml'
+        meta:
+          data_classification: Internal
+      - name: userId
+        description: |
+          Unique userID linked to the transunion soft credit report
+        meta:
+          data_classification: Internal
+      - name: transunionUserReferenceId
+        description: |
+          Reference for the userID linked to the transunion kyc report
+          source field 'userReferenceId'
+        meta:
+          data_classification: Internal
+      - name: transunionKycReportUniqueId
+        description: |
+          External unique id linked to the transunion kyc report
+          source field 'uniqueId'
+        meta:
+          data_classification: Internal
+      - name: transunionKycReportConsumerStatement
+        description: |
+          Fraud statements for customer
+          source field 'consumerStatement'
+        meta:
+          data_classification: Internal
+      - name: transunionKycReportCreatedAt
+        description: |
+          Developer timestamp from mongo - createdAt
+          source field 'createdAt' converted to timestamp
+        meta:
+          data_classification: Internal
+      - name: transunionKycReportUpdatedAt
+        description: |
+          Developer timestamp from mongo - updatedAt
+          source field 'updatedAt' converted to timestamp
+        meta:
+          data_classification: Internal
+
+  - name: stg_application_service__user_profiles
+    description: application user profile data as found in `applicationService.userProfiles`.
+    meta:
+      contains_pii: true
+    columns:
+      - name: userId
+        description: Identifier for each user in the table.
+      - name: userEmploymentDetails
+        description: |
+          User employment details object
+          source field 'employmentDetails'
+        meta:
+          data_classification: Confidential
+      - name: userOccupation
+        description: |
+          User occupation information for application
+          source field 'employmentDetails.occupation'
+        meta:
+          data_classification: Confidential
+      - name: userEmploymentStatus
+        description: |
+          User employment details (STUDENT | RETIRED | EMPLOYED | UNEMPLOYED | SELF_EMPLOYED | NULL)
+          source field 'employmentDetails.employmentStatus'
+        meta:
+          data_classification: Confidential
+      - name: userFieldOfStudy
+        description: |
+          User field of study information
+          source field 'employmentDetails.fieldOfStudy'
+        meta:
+          data_classification: Confidential
+      - name: userLastUpdatedAt
+        description: '{{ doc("updatedAt")}}'
+        meta:
+          data_classification: Internal

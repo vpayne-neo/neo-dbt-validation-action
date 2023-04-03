@@ -1,0 +1,156 @@
+version: 2
+
+models:
+  - name: growth_account
+    description: |
+      Basic information for the money or credit account.
+    config:
+      tags: ['growth']
+    meta:
+      contains_pii: false
+      label: Account
+      joins:
+        - join: subProduct
+          sql_on: ${subProduct.subProductId} = ${account.subProductId}
+        - join: product
+          sql_on: ${product.productId} = ${account.productId}
+        - join: tenant
+          sql_on: ${tenant.tenantId} = ${account.tenantId}
+        - join: card
+          sql_on: ${card.accountId} = ${account.accountId}
+        - join: user
+          sql_on: ${user.userId} = ${account.userId}
+        - join: application
+          sql_on: ${application.accountId} = ${account.accountId}
+        - join: account_balance
+          sql_on: ${account_balance.accountId} = ${account.accountId}
+    columns:
+      - name: accountId
+        description: Account ID for money and credit account
+        meta:
+          data_classification: Internal
+          metrics:
+            count_distinct_accountId:
+              label: Number of Accounts
+              type: count_distinct
+      - name: applicationId
+        description: User application ID
+        meta:
+          data_classification: Internal
+          dimension:
+            hidden: true
+      - name: productId
+        description: Product ID
+        meta:
+          data_classification: Internal
+          dimension:
+            hidden: true
+      - name: subProductId
+        description: Sub product ID
+        meta:
+          data_classification: Internal
+          dimension:
+            hidden: true
+      - name: tenantId
+        description: Tenant ID
+        meta:
+          data_classification: Internal
+          dimension:
+            hidden: true
+      - name: userId
+        description: Unique user identifier
+        meta:
+          data_classification: Internal
+          dimension:
+            hidden: true
+      - name: customerId
+        meta:
+          data_classification: Internal
+      - name: programId
+        meta:
+          data_classification: Internal
+      - name: status
+        description: Status of the account
+        meta:
+          data_classification: Internal
+      - name: closeReason
+        description: The reasoning behind the closure of the account such as (dormant, highrisk, deceased, other)
+        meta:
+          data_classification: Internal
+      - name: cycleDay
+        meta:
+          data_classification: Internal
+          dimension:
+            type: number
+      - name: chargeOffReason
+        description: This is the reason for charge off of the account
+        meta:
+          data_classification: Internal
+      - name: intendedUse
+        description: Intended use of the account such as short term savings, everyday spending, long term savings.
+        meta:
+          data_classification: Internal
+      - name: interestRate_test1
+        description: This is the interest rate in percent
+        meta:
+          data_classification: Internal
+          dimension:
+            type: number
+      - name: cashAdvanceRate
+        description: This is the advance rate in percent
+        meta:
+          data_classification: Internal
+          dimension:
+            type: number
+      - name: overlimitRate
+        description: This is the over limit rate in percent
+        meta:
+          data_classification: Internal
+          dimension:
+            type: number
+      - name: creditLimitDollars
+        description: This is the credit limit in dollars
+        meta:
+          data_classification: Internal
+          dimension:
+            type: number
+          metrics:
+            sum_creditLimitDollars:
+              label: Total Credit Limit
+              type: sum
+            average_creditLimitDollars:
+              label: Average Credit Limit
+              type: average
+      - name: closedAt_utc
+        description: This is the timestamp for when the account was closed (in utc)
+        meta:
+          data_classification: Internal
+          dimension:
+            type: timestamp
+            hidden: true
+      - name: closedAt_mst
+        description: This is the timestamp for when the account was closed (in mst)
+        meta:
+          data_classification: Internal
+          dimension:
+            type: timestamp
+      - name: openedAt_utc
+        description: '{{ doc("createdAt") }}'
+        meta:
+          data_classification: Internal
+          dimension:
+            type: timestamp
+            hidden: true
+      - name: openedAt_mst
+        description: '{{ doc("createdAt") }}'
+        meta:
+          data_classification: Internal
+          dimension:
+            type: timestamp
+      - name: lastRefreshedAt_mst
+        description: The latest refreshed time from growth_account
+        meta:
+          data_classification: Internal
+          dimension:
+            type: timestamp
+            hidden: true

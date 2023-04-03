@@ -7,9 +7,10 @@ const parseDbtAsNativeSql = (dbtSQL: string): string => {
   sql = sql.replace(/^.*{%.*$/gm, '') //   |
   sql = sql.replace(/^.*{%+.*$/gm, '') //  --- Remove jinja from sql
   sql = sql.replace(/^.*--+.*$/gm, '') //--|
-
+  const singleYml = true
   const cteCount = (sql.match(/ as\s\(/g) || []).length // gets the count of how many cte's are in the sql
-
+  if (singleYml) {
+  }
   if (cteCount > 1 && cteCount !== 0) {
     for (let i = 0; i < cteCount; i++) {
       sql = sql.replace(/\sas\s/, ' as').replace(/\n/g, ' ')
