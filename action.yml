@@ -9,5 +9,5 @@ inputs:
 
 runs:
   using: 'docker'
-  image: 'node:18.15.0'
+  image: 'docker://node:18.15.0'
   entrypoint: 'dist/index.js'
