@@ -8,6 +8,5 @@ inputs:
     required: true
 
 runs:
-  using: 'docker'
-  image: 'docker://node:18.15.0'
-  entrypoint: '~/neo-db-validation-action/dist/index.js'
+  using: 'node16'
+  main: 'dist/index.js'
