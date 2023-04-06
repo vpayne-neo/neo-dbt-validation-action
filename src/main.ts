@@ -72,6 +72,7 @@ async function run(): Promise<void> {
           sqlColumnCount
         )}`
       )
+      core.debug(pair.ymlFilePath)
     })
   } catch (err) {
     console.error(err)
