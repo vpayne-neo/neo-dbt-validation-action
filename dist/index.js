@@ -113,6 +113,7 @@ function run() {
                     throw new Error(errorMsg);
                 }
                 core.debug(` Column count equal? : ${(0, util_1.isDeepStrictEqual)(ymlColumnCount, sqlColumnCount)}`);
+                core.debug(pair.ymlFilePath);
             }));
         }
         catch (err) {
