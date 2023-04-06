@@ -97,11 +97,11 @@ function run() {
                 };
             });
             filePairs.map((pair) => __awaiter(this, void 0, void 0, function* () {
+                var _a;
                 const parser = new Parser();
                 const sqlToObject = parser.astify((0, parseDbtasNativeSql_1.default)(pair.sqlAsString));
-                const columnNames = sqlToObject.columns
-                    .map((col) => { var _a; return `${(_a = col.as) !== null && _a !== void 0 ? _a : col.expr.column}`; })
-                    .sort();
+                core.debug(sqlToObject);
+                const columnNames = (_a = sqlToObject.columns) === null || _a === void 0 ? void 0 : _a.map((col) => { var _a; return `${(_a = col.as) !== null && _a !== void 0 ? _a : col.expr.column}`; }).sort();
                 const ymlColumnNames = yield (0, getYmlDetails_1.default)(pair.ymlFilePath);
                 core.debug(`${pair.sqlAsString} \n ${pair.ymlFilePath}`);
                 const ymlColumnCount = ymlColumnNames.length;

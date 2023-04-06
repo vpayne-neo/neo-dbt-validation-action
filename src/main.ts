@@ -34,8 +34,9 @@ async function run(): Promise<void> {
       const parser = new Parser()
 
       const sqlToObject = parser.astify(parseDbtAsNativeSql(pair.sqlAsString))
+      core.debug(sqlToObject)
       const columnNames = sqlToObject.columns
-        .map(
+        ?.map(
           (col: {
             expr: {
               type?: string
