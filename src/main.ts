@@ -36,7 +36,9 @@ async function run(): Promise<void> {
       const sqlToObject = parser.astify(parseDbtAsNativeSql(pair.sqlAsString))
       core.debug(sqlToObject)
       if (sqlToObject.columns == '*') {
-        return
+        throw new Error(
+          `Final select can not be "select *" at ${pair.ymlFilePath}`
+        )
       } else {
         const columnNames = sqlToObject.columns
           ?.map(
