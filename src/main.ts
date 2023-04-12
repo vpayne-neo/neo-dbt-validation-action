@@ -37,7 +37,7 @@ async function run(): Promise<void> {
       core.debug(sqlToObject)
       if (sqlToObject.columns == '*') {
         throw new Error(
-          `Final select can not be "select *" at ${pair.ymlFilePath}`
+          `Final select can not be "select *" at ${pair.sqlAsString}`
         )
       } else {
         const columnNames = sqlToObject.columns
