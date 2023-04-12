@@ -97,23 +97,28 @@ function run() {
                 };
             });
             filePairs.map((pair) => __awaiter(this, void 0, void 0, function* () {
-                var _a, _b;
+                var _a;
                 const parser = new Parser();
                 const sqlToObject = parser.astify((0, parseDbtasNativeSql_1.default)(pair.sqlAsString));
                 core.debug(sqlToObject);
-                const columnNames = (_b = (_a = sqlToObject.columns) === null || _a === void 0 ? void 0 : _a.map((col) => { var _a; return `${(_a = col.as) !== null && _a !== void 0 ? _a : col.expr.column}`; }).sort()) !== null && _b !== void 0 ? _b : [];
-                const ymlColumnNames = yield (0, getYmlDetails_1.default)(pair.ymlFilePath);
-                core.debug(`${pair.sqlAsString} \n ${pair.ymlFilePath}`);
-                const ymlColumnCount = ymlColumnNames.length;
-                const sqlColumnCount = columnNames.length;
-                core.debug(` Column names equal? : ${(0, util_1.isDeepStrictEqual)(ymlColumnNames, columnNames)}`);
-                if ((0, util_1.isDeepStrictEqual)(ymlColumnNames, columnNames) == false) {
-                    const difference = (0, lodash_1.differenceBy)(columnNames, ymlColumnNames).map(diff => ` ${diff}`);
-                    const errorMsg = `Columns do not match =>> ${difference}`;
-                    throw new Error(errorMsg);
+                if (sqlToObject.columns == '*') {
+                    return;
                 }
-                core.debug(` Column count equal? : ${(0, util_1.isDeepStrictEqual)(ymlColumnCount, sqlColumnCount)}`);
-                core.debug(pair.ymlFilePath);
+                else {
+                    const columnNames = (_a = sqlToObject.columns) === null || _a === void 0 ? void 0 : _a.map((col) => { var _a; return `${(_a = col.as) !== null && _a !== void 0 ? _a : col.expr.column}`; }).sort();
+                    const ymlColumnNames = yield (0, getYmlDetails_1.default)(pair.ymlFilePath);
+                    core.debug(`${pair.sqlAsString} \n ${pair.ymlFilePath}`);
+                    const ymlColumnCount = ymlColumnNames.length;
+                    const sqlColumnCount = columnNames.length;
+                    core.debug(` Column names equal? : ${(0, util_1.isDeepStrictEqual)(ymlColumnNames, columnNames)}`);
+                    if ((0, util_1.isDeepStrictEqual)(ymlColumnNames, columnNames) == false) {
+                        const difference = (0, lodash_1.differenceBy)(columnNames, ymlColumnNames).map(diff => ` ${diff}`);
+                        const errorMsg = `Columns do not match =>> ${difference}`;
+                        throw new Error(errorMsg);
+                    }
+                    core.debug(` Column count equal? : ${(0, util_1.isDeepStrictEqual)(ymlColumnCount, sqlColumnCount)}`);
+                    core.debug(pair.ymlFilePath);
+                }
             }));
         }
         catch (err) {

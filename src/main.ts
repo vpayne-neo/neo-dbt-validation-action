@@ -35,8 +35,10 @@ async function run(): Promise<void> {
 
       const sqlToObject = parser.astify(parseDbtAsNativeSql(pair.sqlAsString))
       core.debug(sqlToObject)
-      const columnNames =
-        sqlToObject.columns
+      if (sqlToObject.columns == '*') {
+        return
+      } else {
+        const columnNames = sqlToObject.columns
           ?.map(
             (col: {
               expr: {
@@ -47,34 +49,35 @@ async function run(): Promise<void> {
               as?: string
             }) => `${col.as ?? col.expr.column}`
           )
-          .sort() ?? []
+          .sort()
 
-      const ymlColumnNames = await getYmlDetails(pair.ymlFilePath)
-      core.debug(`${pair.sqlAsString} \n ${pair.ymlFilePath}`)
+        const ymlColumnNames = await getYmlDetails(pair.ymlFilePath)
+        core.debug(`${pair.sqlAsString} \n ${pair.ymlFilePath}`)
 
-      const ymlColumnCount = ymlColumnNames.length
-      const sqlColumnCount = columnNames.length
-      core.debug(
-        ` Column names equal? : ${isDeepStrictEqual(
-          ymlColumnNames,
-          columnNames
-        )}`
-      )
-      if (isDeepStrictEqual(ymlColumnNames, columnNames) == false) {
-        const difference = differenceBy(columnNames, ymlColumnNames).map(
-          diff => ` ${diff}`
+        const ymlColumnCount = ymlColumnNames.length
+        const sqlColumnCount = columnNames.length
+        core.debug(
+          ` Column names equal? : ${isDeepStrictEqual(
+            ymlColumnNames,
+            columnNames
+          )}`
         )
-        const errorMsg = `Columns do not match =>> ${difference}`
-        throw new Error(errorMsg)
-      }
+        if (isDeepStrictEqual(ymlColumnNames, columnNames) == false) {
+          const difference = differenceBy(columnNames, ymlColumnNames).map(
+            diff => ` ${diff}`
+          )
+          const errorMsg = `Columns do not match =>> ${difference}`
+          throw new Error(errorMsg)
+        }
 
-      core.debug(
-        ` Column count equal? : ${isDeepStrictEqual(
-          ymlColumnCount,
-          sqlColumnCount
-        )}`
-      )
-      core.debug(pair.ymlFilePath)
+        core.debug(
+          ` Column count equal? : ${isDeepStrictEqual(
+            ymlColumnCount,
+            sqlColumnCount
+          )}`
+        )
+        core.debug(pair.ymlFilePath)
+      }
     })
   } catch (err) {
     console.error(err)
