@@ -102,7 +102,7 @@ function run() {
                 const sqlToObject = parser.astify((0, parseDbtasNativeSql_1.default)(pair.sqlAsString));
                 core.debug(sqlToObject);
                 if (sqlToObject.columns == '*') {
-                    return;
+                    throw new Error(`Final select can not be "select *" at ${pair.ymlFilePath}`);
                 }
                 else {
                     const columnNames = (_a = sqlToObject.columns) === null || _a === void 0 ? void 0 : _a.map((col) => { var _a; return `${(_a = col.as) !== null && _a !== void 0 ? _a : col.expr.column}`; }).sort();
