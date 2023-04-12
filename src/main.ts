@@ -66,7 +66,7 @@ async function run(): Promise<void> {
           const difference = differenceBy(columnNames, ymlColumnNames).map(
             diff => ` ${diff}`
           )
-          const errorMsg = `Columns do not match =>> ${difference}`
+          const errorMsg = `Columns do not match =>> at ${pair.ymlFilePath} Columns:  ${difference}`
           throw new Error(errorMsg)
         }
 
