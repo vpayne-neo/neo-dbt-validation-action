@@ -1,5 +1,3 @@
-import {differenceBy} from 'lodash'
-
 const parseDbtAsNativeSql = (dbtSQL: string): string => {
   // This funtion reads a string and removes dbt patterns from it
   let sql = dbtSQL

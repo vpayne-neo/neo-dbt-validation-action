@@ -40,7 +40,7 @@ async function run(): Promise<void> {
           `Final select can not be "select *" at ${pair.sqlAsString}`
         )
       } else {
-        const columnNames = sqlToObject.columns
+        const columnNames: Array<string> = sqlToObject.columns
           ?.map(
             (col: {
               expr: {
