@@ -35,18 +35,19 @@ async function run(): Promise<void> {
 
       const sqlToObject = parser.astify(parseDbtAsNativeSql(pair.sqlAsString))
       core.debug(sqlToObject)
-      const columnNames = sqlToObject.columns
-        ?.map(
-          (col: {
-            expr: {
-              type?: string
-              table?: string
-              column?: string
-            }
-            as?: string
-          }) => `${col.as ?? col.expr.column}`
-        )
-        .sort()
+      const columnNames =
+        sqlToObject.columns
+          ?.map(
+            (col: {
+              expr: {
+                type?: string
+                table?: string
+                column?: string
+              }
+              as?: string
+            }) => `${col.as ?? col.expr.column}`
+          )
+          .sort() ?? []
 
       const ymlColumnNames = await getYmlDetails(pair.ymlFilePath)
       core.debug(`${pair.sqlAsString} \n ${pair.ymlFilePath}`)
