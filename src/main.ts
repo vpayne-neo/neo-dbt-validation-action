@@ -8,36 +8,37 @@ import parseDbtAsNativeSql from './parseDbtasNativeSql'
 import {getInput} from '@actions/core'
 
 async function run(): Promise<void> {
-  try {
-    const paths = getInput('files')
-    core.debug(paths)
+  const paths = getInput('files')
+  core.debug(paths)
 
-    const sqlFilePaths = paths.split(' ').filter(sql => sql.includes('.sql'))
-    const ymlFilePaths = paths.split(' ').filter(yml => yml.includes('.yml'))
+  const sqlFilePaths = paths.split(' ').filter(sql => sql.includes('.sql'))
+  const ymlFilePaths = paths.split(' ').filter(yml => yml.includes('.yml'))
 
-    type SqlYmlFilePairs = {
-      sqlAsString: string
-      ymlFilePath: string
+  type SqlYmlFilePairs = {
+    sqlAsString: string
+    ymlFilePath: string
+  }
+
+  const filePairs: Array<SqlYmlFilePairs> = sqlFilePaths.map(sqlFile => {
+    const yml = ymlFilePaths.find(yml =>
+      yml.includes(sqlFile.replace('.sql', ''))
+    )
+    return {
+      sqlAsString: fs.readFileSync(sqlFile, 'utf-8'),
+      ymlFilePath: yml ?? ''
     }
+  })
 
-    const filePairs: Array<SqlYmlFilePairs> = sqlFilePaths.map(sqlFile => {
-      const yml = ymlFilePaths.find(yml =>
-        yml.includes(sqlFile.replace('.sql', ''))
-      )
-      return {
-        sqlAsString: fs.readFileSync(sqlFile, 'utf-8'),
-        ymlFilePath: yml ?? ''
-      }
-    })
-
-    filePairs.map(async pair => {
+  filePairs.map(async pair => {
+    try {
       const parser = new Parser()
+      const parsedSql = parseDbtAsNativeSql(pair.sqlAsString)
 
-      const sqlToObject = parser.astify(parseDbtAsNativeSql(pair.sqlAsString))
-      core.debug(sqlToObject)
+      const sqlToObject = parser.astify(parsedSql)
+
       if (sqlToObject.columns == '*') {
         throw new Error(
-          `Final select can not be "select *" at ${pair.sqlAsString}`
+          `Final CTE can not be "select *" at ${pair.sqlAsString}`
         )
       } else {
         const columnNames: Array<string> = sqlToObject.columns
@@ -80,11 +81,10 @@ async function run(): Promise<void> {
         )
         core.debug(pair.ymlFilePath)
       }
-    })
-  } catch (err) {
-    console.error(err)
-    process.exit()
-  }
+    } catch (err: any) {
+      throw new Error(pair.ymlFilePath + '\n' + err)
+    }
+  })
 }
 
 run()
