@@ -11,19 +11,16 @@ import getYamlColumnNames from './getYamlColumnNames'
 import createFilePairs from './createFilePairs'
 
 async function run(): Promise<void> {
-  try {
-    const paths =
-      'src/diff.yml src/test2.sql src/test.sql src/test4.sql src/test4.yml'
-    // const paths = `src/test4.yml src/test4.sql`
-    // const paths = getInput('files')
-    core.debug(paths)
+  const paths = getInput('files')
+  core.debug(paths)
 
-    const sqlFilePaths = paths.split(' ').filter(sql => sql.includes('.sql'))
-    const ymlFilePaths = paths.split(' ').filter(yml => yml.includes('.yml'))
+  const sqlFilePaths = paths.split(' ').filter(sql => sql.includes('.sql'))
+  const ymlFilePaths = paths.split(' ').filter(yml => yml.includes('.yml'))
 
-    const filePairs = createFilePairs(sqlFilePaths, ymlFilePaths)
+  const filePairs = createFilePairs(sqlFilePaths, ymlFilePaths)
 
-    filePairs.map(async pair => {
+  filePairs.map(async pair => {
+    try {
       const parser = new Parser()
 
       const sqlToObject = parser.astify(parseDbtAsNativeSql(pair.sqlAsString))
@@ -39,7 +36,11 @@ async function run(): Promise<void> {
           }) => `${col.as ?? col.expr.column}`
         )
         .sort()
-
+      if (sqlToObject.columns == '*') {
+        throw new Error(
+          `Final CTE can not be "select *" at ${pair.sqlAsString}`
+        )
+      }
       if (pair.singleYml) {
         const ymlNames = getYamlColumnNames(pair.ymlFilePath)
         ymlNames.map(ymlN => {
@@ -75,11 +76,10 @@ async function run(): Promise<void> {
           )}`
         )
       }
-    })
-  } catch (err) {
-    console.error(err)
-    process.exit()
-  }
+    } catch (err: any) {
+      throw new Error(pair.ymlFilePath + '\n' + err)
+    }
+  })
 }
 
 run()

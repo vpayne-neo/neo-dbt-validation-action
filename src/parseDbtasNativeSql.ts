@@ -1,28 +1,27 @@
-import {differenceBy} from 'lodash'
-
 const parseDbtAsNativeSql = (dbtSQL: string): string => {
   // This funtion reads a string and removes dbt patterns from it
   let sql = dbtSQL
+
   sql = sql.replace(/^.*{%-.*$/gm, '') // --
   sql = sql.replace(/^.*{%.*$/gm, '') //   |
   sql = sql.replace(/^.*{%+.*$/gm, '') //  --- Remove jinja from sql
   sql = sql.replace(/^.*--+.*$/gm, '') //--|
-  const singleYml = true
+
   const cteCount = (sql.match(/ as\s\(/g) || []).length // gets the count of how many cte's are in the sql
-  if (singleYml) {
-  }
   if (cteCount > 1 && cteCount !== 0) {
     for (let i = 0; i < cteCount; i++) {
       sql = sql.replace(/\sas\s/, ' as').replace(/\n/g, ' ')
 
       // remove space after as for each cte and places string on one line
-      const matchedCte = sql.match(/as\(.*?[^\)]from/)?.map(cte => cte)[0] // assigns current cte to variable
-
+      const matchedCte = sql.match(/as\(.*?[^\)]\s\),/)?.map(cte => cte)[0]
+      // assigns current cte to variable
       sql = sql.replace(matchedCte ?? '', '')
 
       if (i == cteCount - 1) {
-        // on the last cte we assign out matched cte to the sql variable
-        sql = matchedCte ?? ''
+        const lastCte = sql.match(/as\(.*?[^\)]from\s/)?.map(cte => cte)[0]
+
+        // on the last cte we assign our matched cte to the sql variable
+        sql = lastCte ?? ''
 
         sql = sql?.replace('as(', '')
 
@@ -50,6 +49,7 @@ const parseDbtAsNativeSql = (dbtSQL: string): string => {
     columnJinja?.map(jinja => (sql = sql?.replace(jinja, '')))
 
     sql = sql?.replace('from ', '') //removes 'from' from the string
+
     return sql
   }
 
