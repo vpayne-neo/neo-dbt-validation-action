@@ -1,6 +1,93 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 7572:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const fs = __importStar(__nccwpck_require__(5747));
+const createFilePairs = (sqlFilePaths, ymlFilePaths) => {
+    return sqlFilePaths.map(sqlFile => {
+        const yml = ymlFilePaths.find(yml => yml.includes(sqlFile.replace('.sql', '')));
+        return {
+            sqlAsString: fs.readFileSync(sqlFile, 'utf-8'),
+            ymlFilePath: yml !== null && yml !== void 0 ? yml : ymlFilePaths[0],
+            singleYml: yml ? false : true
+        };
+    });
+};
+exports.default = createFilePairs;
+
+
+/***/ }),
+
+/***/ 3789:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const fs = __importStar(__nccwpck_require__(5747));
+const yaml = __importStar(__nccwpck_require__(1917));
+const getYamlTableNames = (filePath) => {
+    const contents = fs.readFileSync(filePath, 'utf-8');
+    const data = yaml.load(contents);
+    const models = data.models.flatMap((mod) => mod);
+    const ymlDataSeperated = models.map((model) => {
+        return {
+            columnNames: model.columns
+                .map((col) => col.name)
+                .filter((colNames) => colNames !== '_v' && colNames !== '_id' && colNames !== '__v')
+                .sort()
+        };
+    });
+    return ymlDataSeperated;
+};
+exports.default = getYamlTableNames;
+
+
+/***/ }),
+
 /***/ 3577:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -79,45 +166,47 @@ const { Parser } = __nccwpck_require__(2047);
 const util_1 = __nccwpck_require__(1669);
 const getYmlDetails_1 = __importDefault(__nccwpck_require__(3577));
 const lodash_1 = __nccwpck_require__(250);
-const fs = __importStar(__nccwpck_require__(5747));
 const parseDbtasNativeSql_1 = __importDefault(__nccwpck_require__(6941));
 const core_1 = __nccwpck_require__(2186);
+const getYamlColumnNames_1 = __importDefault(__nccwpck_require__(3789));
+const createFilePairs_1 = __importDefault(__nccwpck_require__(7572));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         const paths = (0, core_1.getInput)('files');
         core.debug(paths);
         const sqlFilePaths = paths.split(' ').filter(sql => sql.includes('.sql'));
         const ymlFilePaths = paths.split(' ').filter(yml => yml.includes('.yml'));
-        const filePairs = sqlFilePaths.map(sqlFile => {
-            const yml = ymlFilePaths.find(yml => yml.includes(sqlFile.replace('.sql', '')));
-            return {
-                sqlAsString: fs.readFileSync(sqlFile, 'utf-8'),
-                ymlFilePath: yml !== null && yml !== void 0 ? yml : ''
-            };
-        });
+        const filePairs = (0, createFilePairs_1.default)(sqlFilePaths, ymlFilePaths);
         filePairs.map((pair) => __awaiter(this, void 0, void 0, function* () {
-            var _a;
             try {
                 const parser = new Parser();
-                const parsedSql = (0, parseDbtasNativeSql_1.default)(pair.sqlAsString);
-                const sqlToObject = parser.astify(parsedSql);
+                const sqlToObject = parser.astify((0, parseDbtasNativeSql_1.default)(pair.sqlAsString));
+                const sqlColumnNames = sqlToObject.columns
+                    .map((col) => { var _a; return `${(_a = col.as) !== null && _a !== void 0 ? _a : col.expr.column}`; })
+                    .sort();
                 if (sqlToObject.columns == '*') {
                     throw new Error(`Final CTE can not be "select *" at ${pair.sqlAsString}`);
                 }
+                if (pair.singleYml) {
+                    const ymlNames = (0, getYamlColumnNames_1.default)(pair.ymlFilePath);
+                    ymlNames.map(ymlN => {
+                        core.debug(` Matching names : ${(0, util_1.isDeepStrictEqual)(ymlN.columnNames, sqlColumnNames)
+                            ? `${sqlColumnNames}`
+                            : 'No matching columns'}`);
+                    });
+                }
                 else {
-                    const columnNames = (_a = sqlToObject.columns) === null || _a === void 0 ? void 0 : _a.map((col) => { var _a; return `${(_a = col.as) !== null && _a !== void 0 ? _a : col.expr.column}`; }).sort();
                     const ymlColumnNames = yield (0, getYmlDetails_1.default)(pair.ymlFilePath);
-                    core.debug(`${pair.sqlAsString} \n ${pair.ymlFilePath}`);
                     const ymlColumnCount = ymlColumnNames.length;
-                    const sqlColumnCount = columnNames.length;
-                    core.debug(` Column names equal? : ${(0, util_1.isDeepStrictEqual)(ymlColumnNames, columnNames)}`);
-                    if ((0, util_1.isDeepStrictEqual)(ymlColumnNames, columnNames) == false) {
-                        const difference = (0, lodash_1.differenceBy)(columnNames, ymlColumnNames).map(diff => ` ${diff}`);
-                        const errorMsg = `Columns do not match =>> at ${pair.ymlFilePath} Columns:  ${difference}`;
+                    const sqlColumnCount = sqlColumnNames.length;
+                    if ((0, util_1.isDeepStrictEqual)(ymlColumnNames, sqlColumnNames) == false) {
+                        const difference = (0, lodash_1.differenceBy)(sqlColumnNames, ymlColumnNames).map(diff => ` ${diff}`);
+                        const errorMsg = `Columns do not match =>> ${difference}`;
+                        core.debug(`Column names equal: false`);
                         throw new Error(errorMsg);
                     }
+                    core.debug(`Column names equal: true`);
                     core.debug(` Column count equal? : ${(0, util_1.isDeepStrictEqual)(ymlColumnCount, sqlColumnCount)}`);
-                    core.debug(pair.ymlFilePath);
                 }
             }
             catch (err) {
