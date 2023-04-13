@@ -84,42 +84,46 @@ const parseDbtasNativeSql_1 = __importDefault(__nccwpck_require__(6941));
 const core_1 = __nccwpck_require__(2186);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const paths = (0, core_1.getInput)('files');
-            core.debug(paths);
-            const sqlFilePaths = paths.split(' ').filter(sql => sql.includes('.sql'));
-            const ymlFilePaths = paths.split(' ').filter(yml => yml.includes('.yml'));
-            const filePairs = sqlFilePaths.map(sqlFile => {
-                const yml = ymlFilePaths.find(yml => yml.includes(sqlFile.replace('.sql', '')));
-                return {
-                    sqlAsString: fs.readFileSync(sqlFile, 'utf-8'),
-                    ymlFilePath: yml !== null && yml !== void 0 ? yml : ''
-                };
-            });
-            filePairs.map((pair) => __awaiter(this, void 0, void 0, function* () {
-                var _a;
+        const paths = (0, core_1.getInput)('files');
+        core.debug(paths);
+        const sqlFilePaths = paths.split(' ').filter(sql => sql.includes('.sql'));
+        const ymlFilePaths = paths.split(' ').filter(yml => yml.includes('.yml'));
+        const filePairs = sqlFilePaths.map(sqlFile => {
+            const yml = ymlFilePaths.find(yml => yml.includes(sqlFile.replace('.sql', '')));
+            return {
+                sqlAsString: fs.readFileSync(sqlFile, 'utf-8'),
+                ymlFilePath: yml !== null && yml !== void 0 ? yml : ''
+            };
+        });
+        filePairs.map((pair) => __awaiter(this, void 0, void 0, function* () {
+            var _a;
+            try {
                 const parser = new Parser();
-                const sqlToObject = parser.astify((0, parseDbtasNativeSql_1.default)(pair.sqlAsString));
-                core.debug(sqlToObject);
-                const columnNames = (_a = sqlToObject.columns) === null || _a === void 0 ? void 0 : _a.map((col) => { var _a; return `${(_a = col.as) !== null && _a !== void 0 ? _a : col.expr.column}`; }).sort();
-                const ymlColumnNames = yield (0, getYmlDetails_1.default)(pair.ymlFilePath);
-                core.debug(`${pair.sqlAsString} \n ${pair.ymlFilePath}`);
-                const ymlColumnCount = ymlColumnNames.length;
-                const sqlColumnCount = columnNames.length;
-                core.debug(` Column names equal? : ${(0, util_1.isDeepStrictEqual)(ymlColumnNames, columnNames)}`);
-                if ((0, util_1.isDeepStrictEqual)(ymlColumnNames, columnNames) == false) {
-                    const difference = (0, lodash_1.differenceBy)(columnNames, ymlColumnNames).map(diff => ` ${diff}`);
-                    const errorMsg = `Columns do not match =>> ${difference}`;
-                    throw new Error(errorMsg);
+                const parsedSql = (0, parseDbtasNativeSql_1.default)(pair.sqlAsString);
+                const sqlToObject = parser.astify(parsedSql);
+                if (sqlToObject.columns == '*') {
+                    throw new Error(`Final CTE can not be "select *" at ${pair.sqlAsString}`);
                 }
-                core.debug(` Column count equal? : ${(0, util_1.isDeepStrictEqual)(ymlColumnCount, sqlColumnCount)}`);
-                core.debug(pair.ymlFilePath);
-            }));
-        }
-        catch (err) {
-            console.error(err);
-            process.exit();
-        }
+                else {
+                    const columnNames = (_a = sqlToObject.columns) === null || _a === void 0 ? void 0 : _a.map((col) => { var _a; return `${(_a = col.as) !== null && _a !== void 0 ? _a : col.expr.column}`; }).sort();
+                    const ymlColumnNames = yield (0, getYmlDetails_1.default)(pair.ymlFilePath);
+                    core.debug(`${pair.sqlAsString} \n ${pair.ymlFilePath}`);
+                    const ymlColumnCount = ymlColumnNames.length;
+                    const sqlColumnCount = columnNames.length;
+                    core.debug(` Column names equal? : ${(0, util_1.isDeepStrictEqual)(ymlColumnNames, columnNames)}`);
+                    if ((0, util_1.isDeepStrictEqual)(ymlColumnNames, columnNames) == false) {
+                        const difference = (0, lodash_1.differenceBy)(columnNames, ymlColumnNames).map(diff => ` ${diff}`);
+                        const errorMsg = `Columns do not match =>> at ${pair.ymlFilePath} Columns:  ${difference}`;
+                        throw new Error(errorMsg);
+                    }
+                    core.debug(` Column count equal? : ${(0, util_1.isDeepStrictEqual)(ymlColumnCount, sqlColumnCount)}`);
+                    core.debug(pair.ymlFilePath);
+                }
+            }
+            catch (err) {
+                throw new Error(pair.ymlFilePath + '\n' + err);
+            }
+        }));
     });
 }
 run();
@@ -134,7 +138,7 @@ run();
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const parseDbtAsNativeSql = (dbtSQL) => {
-    var _a, _b;
+    var _a, _b, _c;
     // This funtion reads a string and removes dbt patterns from it
     let sql = dbtSQL;
     sql = sql.replace(/^.*{%-.*$/gm, ''); // --
@@ -146,11 +150,13 @@ const parseDbtAsNativeSql = (dbtSQL) => {
         for (let i = 0; i < cteCount; i++) {
             sql = sql.replace(/\sas\s/, ' as').replace(/\n/g, ' ');
             // remove space after as for each cte and places string on one line
-            const matchedCte = (_a = sql.match(/as\(.*?[^\)]from/)) === null || _a === void 0 ? void 0 : _a.map(cte => cte)[0]; // assigns current cte to variable
+            const matchedCte = (_a = sql.match(/as\(.*?[^\)]\s\),/)) === null || _a === void 0 ? void 0 : _a.map(cte => cte)[0];
+            // assigns current cte to variable
             sql = sql.replace(matchedCte !== null && matchedCte !== void 0 ? matchedCte : '', '');
             if (i == cteCount - 1) {
-                // on the last cte we assign out matched cte to the sql variable
-                sql = matchedCte !== null && matchedCte !== void 0 ? matchedCte : '';
+                const lastCte = (_b = sql.match(/as\(.*?[^\)]from\s/)) === null || _b === void 0 ? void 0 : _b.map(cte => cte)[0];
+                // on the last cte we assign our matched cte to the sql variable
+                sql = lastCte !== null && lastCte !== void 0 ? lastCte : '';
                 sql = sql === null || sql === void 0 ? void 0 : sql.replace('as(', '');
                 const columnJinja = sql === null || sql === void 0 ? void 0 : sql.match(/{{.*?[^]}}\sas/g);
                 columnJinja === null || columnJinja === void 0 ? void 0 : columnJinja.map(jinja => (sql = sql === null || sql === void 0 ? void 0 : sql.replace(jinja, '')));
@@ -163,7 +169,7 @@ const parseDbtAsNativeSql = (dbtSQL) => {
     else {
         sql = sql.replace(/\sas\s/, ' as').replace(/\n/g, ' '); // remove space after as and formats string on one line
         const selectStatement = sql.match(/as\(.*?[^\)]from\s/); //matches everythin between as( - from
-        const selectWithoutAs = (_b = selectStatement === null || selectStatement === void 0 ? void 0 : selectStatement.map(select => select)[0]) === null || _b === void 0 ? void 0 : _b.replace('as(', ''); // removes string from regex array and store in variable, then removes as(
+        const selectWithoutAs = (_c = selectStatement === null || selectStatement === void 0 ? void 0 : selectStatement.map(select => select)[0]) === null || _c === void 0 ? void 0 : _c.replace('as(', ''); // removes string from regex array and store in variable, then removes as(
         sql = selectWithoutAs !== null && selectWithoutAs !== void 0 ? selectWithoutAs : '';
         const columnJinja = sql === null || sql === void 0 ? void 0 : sql.match(/{{.*?[^]}}\sas/g); // finds all occurences of column jinja and removes it while leaving column name
         columnJinja === null || columnJinja === void 0 ? void 0 : columnJinja.map(jinja => (sql = sql === null || sql === void 0 ? void 0 : sql.replace(jinja, '')));
