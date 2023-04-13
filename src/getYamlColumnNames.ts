@@ -5,7 +5,7 @@ const getYamlTableNames = (filePath: string) => {
   const contents = fs.readFileSync(filePath, 'utf-8')
 
   const data: any = yaml.load(contents)
-  const models = data.models.flatMap((mod: any) => mod)
+  const models = data.models.flatMap((mod: any) => mod) ?? []
   const ymlDataSeperated: Array<{
     columnNames: Array<string>
   }> = models.map((model: any) => {

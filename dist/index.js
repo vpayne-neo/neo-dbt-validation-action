@@ -70,9 +70,10 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const fs = __importStar(__nccwpck_require__(5747));
 const yaml = __importStar(__nccwpck_require__(1917));
 const getYamlTableNames = (filePath) => {
+    var _a;
     const contents = fs.readFileSync(filePath, 'utf-8');
     const data = yaml.load(contents);
-    const models = data.models.flatMap((mod) => mod);
+    const models = (_a = data.models.flatMap((mod) => mod)) !== null && _a !== void 0 ? _a : [];
     const ymlDataSeperated = models.map((model) => {
         return {
             columnNames: model.columns
