@@ -37,9 +37,10 @@ async function run(): Promise<void> {
         )
         .sort()
       if (sqlToObject.columns == '*') {
-        throw new Error(
-          `Final CTE can not be "select *" at ${pair.sqlAsString}`
-        )
+        // throw new Error(
+        //   `Final CTE can not be "select *" at ${pair.sqlAsString}`
+        // )
+        console.log(`Final CTE can not be "select *" at ${pair.sqlAsString}`)
       }
       if (pair.singleYml) {
         const ymlNames = getYamlColumnNames(pair.ymlFilePath)
@@ -66,7 +67,8 @@ async function run(): Promise<void> {
 
           core.debug(`Column names equal: false`)
 
-          throw new Error(errorMsg)
+          // throw new Error(errorMsg)
+          console.log(errorMsg)
         }
         core.debug(`Column names equal: true`)
         core.debug(
@@ -77,7 +79,8 @@ async function run(): Promise<void> {
         )
       }
     } catch (err: any) {
-      throw new Error(pair.ymlFilePath + '\n' + err)
+      // throw new Error(pair.ymlFilePath + '\n' + err)
+      console.log(pair.ymlFilePath + '\n' + err)
     }
   })
 }

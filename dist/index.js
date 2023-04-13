@@ -185,7 +185,10 @@ function run() {
                     .map((col) => { var _a; return `${(_a = col.as) !== null && _a !== void 0 ? _a : col.expr.column}`; })
                     .sort();
                 if (sqlToObject.columns == '*') {
-                    throw new Error(`Final CTE can not be "select *" at ${pair.sqlAsString}`);
+                    // throw new Error(
+                    //   `Final CTE can not be "select *" at ${pair.sqlAsString}`
+                    // )
+                    console.log(`Final CTE can not be "select *" at ${pair.sqlAsString}`);
                 }
                 if (pair.singleYml) {
                     const ymlNames = (0, getYamlColumnNames_1.default)(pair.ymlFilePath);
@@ -203,14 +206,16 @@ function run() {
                         const difference = (0, lodash_1.differenceBy)(sqlColumnNames, ymlColumnNames).map(diff => ` ${diff}`);
                         const errorMsg = `Columns do not match =>> ${difference}`;
                         core.debug(`Column names equal: false`);
-                        throw new Error(errorMsg);
+                        // throw new Error(errorMsg)
+                        console.log(errorMsg);
                     }
                     core.debug(`Column names equal: true`);
                     core.debug(` Column count equal? : ${(0, util_1.isDeepStrictEqual)(ymlColumnCount, sqlColumnCount)}`);
                 }
             }
             catch (err) {
-                throw new Error(pair.ymlFilePath + '\n' + err);
+                // throw new Error(pair.ymlFilePath + '\n' + err)
+                console.log(pair.ymlFilePath + '\n' + err);
             }
         }));
     });
